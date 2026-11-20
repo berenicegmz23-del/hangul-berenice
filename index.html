@@ -1,0 +1,1197 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="Aprende a leer, escribir y hablar coreano (y practica inglés) desde cero. App personal de Berenice.">
+<meta name="theme-color" content="#FDEBF1">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" type="image/png" sizes="32x32" href="icons/icon-32.png">
+<link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
+<link rel="apple-touch-icon" href="icons/icon-180.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Hangul">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<title>Hangul de Berenice</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Black+Han+Sans&family=Fredoka:wght@500;600&family=Noto+Sans+KR:wght@400;500;700&family=Nunito:wght@400;600;700&display=swap">
+<style>
+/* Layout: cuaderno de práctica coreano (원고지) en rosa pastel. Tema único y claro, a pedido de Berenice. Pestañas abajo en celular, arriba en iPad. */
+:root{
+  --paper:#FDEBF1; --sheet:#FFF8FA; --ink:#6B0F24; --muted:#9B5566;
+  --line:#F5CAD6; --grid:#F09DB4; --accent:#B0123F; --accent-soft:#FAD3DF;
+  --warn:#C2410C; --gold:#D4951C; --guide:#F7CCD8; --guide-num:#B0123F;
+  --display:"Fredoka","Black Han Sans","Noto Sans KR",system-ui,sans-serif;
+  --body:"Nunito","Noto Sans KR",system-ui,-apple-system,sans-serif;
+  --kr:"Noto Sans KR","Apple SD Gothic Neo","Malgun Gothic",sans-serif;
+  color-scheme:light;
+}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+body{background:var(--paper);color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.5;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));
+  padding-block:0 96px;-webkit-tap-highlight-color:transparent}
+.kr{font-family:var(--kr)}
+button{font:inherit;color:inherit;cursor:pointer}
+button:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.wrap{max-width:980px;margin:0 auto}
+header.top{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;padding-block:18px 8px}
+header.top h1{font-family:var(--display);font-weight:600;font-size:30px;margin:0;letter-spacing:.3px}
+header.top h1 .krn{font-family:"Black Han Sans",var(--kr);font-weight:400}
+header.top h1 span{color:var(--accent)}
+@media (max-width:520px){header.top h1{font-size:23px}}
+header.top p{margin:0;color:var(--muted);font-size:14px}
+nav.tabs{position:fixed;left:0;right:0;bottom:0;z-index:20;background:var(--sheet);border-top:1px solid var(--line);
+  display:grid;grid-template-columns:repeat(5,1fr);
+  padding:6px max(8px,env(safe-area-inset-right,0px)) calc(6px + env(safe-area-inset-bottom,0px)) max(8px,env(safe-area-inset-left,0px))}
+nav.tabs button{background:none;border:0;border-radius:12px;padding:6px 4px;display:flex;flex-direction:column;align-items:center;gap:2px;font-size:12.5px;color:var(--muted)}
+nav.tabs button b{font-family:var(--kr);font-size:20px;line-height:1.1;font-weight:700}
+nav.tabs button[aria-selected="true"]{color:var(--accent);background:var(--accent-soft)}
+@media (min-width:760px){
+  body{padding-block:0 40px}
+  nav.tabs{position:sticky;top:env(safe-area-inset-top,0px);bottom:auto;border:1px solid var(--line);border-radius:16px;margin:4px 0 18px;max-width:980px;margin-inline:auto;padding:6px}
+  nav.tabs button{flex-direction:row;justify-content:center;gap:8px;font-size:15px;padding:10px}
+}
+section.view{display:grid;gap:16px}
+.panel{background:var(--sheet);border:1px solid var(--line);border-radius:18px;padding:16px}
+h2{font-family:var(--display);font-weight:600;font-size:22px;margin:0 0 4px}
+h3{font-size:15px;margin:0 0 8px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.hint{color:var(--muted);font-size:14px;margin:0}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.btn{border:1px solid var(--line);background:var(--sheet);border-radius:12px;padding:10px 14px;font-weight:500;min-height:44px}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:var(--sheet)}
+.btn.ghost{background:transparent}
+.btn[aria-pressed="true"]{background:var(--accent-soft);border-color:var(--accent);color:var(--accent)}
+.btn:disabled{opacity:.45;cursor:default}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:12px;overflow:hidden;flex-wrap:wrap}
+.seg button{border:0;background:transparent;padding:9px 13px;min-height:42px;font-size:14.5px}
+.seg button[aria-pressed="true"]{background:var(--accent);color:var(--sheet)}
+
+/* Escribir */
+.write-grid{display:grid;grid-template-columns:minmax(0,1fr);gap:16px}
+@media (min-width:860px){.write-grid{grid-template-columns:minmax(0,1.15fr) minmax(0,1fr)}}
+.board{display:grid;gap:12px;justify-items:center}
+.canvas-box{position:relative;width:100%;max-width:520px;aspect-ratio:1/1}
+#pad{width:100%;height:100%;display:block;border-radius:14px;background:var(--sheet);border:2px solid var(--grid);touch-action:none;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
+.status{min-height:48px;text-align:center;font-weight:500;padding:8px 12px;border-radius:12px;width:100%;max-width:520px}
+.status.ok{background:var(--accent-soft);color:var(--accent)}
+.status.bad{background:color-mix(in srgb,var(--warn) 14%,transparent);color:var(--warn)}
+.status.done{background:color-mix(in srgb,var(--gold) 18%,transparent);color:var(--ink)}
+.info-card{display:grid;grid-template-columns:auto minmax(0,1fr);gap:14px;align-items:center}
+.big-glyph{font-family:var(--kr);font-size:64px;font-weight:700;line-height:1;width:92px;height:92px;display:grid;place-items:center;border:2px solid var(--grid);border-radius:14px;
+  background-image:linear-gradient(var(--line),var(--line)),linear-gradient(var(--line),var(--line));background-size:100% 1px,1px 100%;background-position:center;background-repeat:no-repeat}
+.info-card .name{font-size:20px;font-weight:600}
+.info-card .rom{font-family:var(--body);color:var(--accent);font-weight:600}
+.picker{display:grid;grid-template-columns:repeat(auto-fill,minmax(52px,1fr));gap:6px}
+.picker button{font-family:var(--kr);font-size:24px;aspect-ratio:1/1;border:1px solid var(--line);border-radius:10px;background:var(--sheet);position:relative;min-height:48px}
+.picker button small{position:absolute;bottom:2px;left:0;right:0;font-family:var(--body);font-size:10px;color:var(--muted)}
+.picker button.learned::after{content:"";position:absolute;top:5px;right:5px;width:8px;height:8px;border-radius:50%;background:var(--gold)}
+.picker button[aria-current="true"]{border-color:var(--accent);background:var(--accent-soft);color:var(--accent)}
+.seq{display:flex;gap:6px;flex-wrap:wrap}
+.seq span{font-family:var(--kr);font-size:22px;padding:2px 10px;border-radius:8px;border:1px solid var(--line)}
+.seq span.cur{border-color:var(--accent);color:var(--accent);background:var(--accent-soft)}
+.seq span.ok{color:var(--muted)}
+input[type=text],textarea,select{font:inherit;color:var(--ink);background:var(--paper);border:1px solid var(--line);border-radius:12px;padding:10px 12px;min-height:44px;width:100%}
+textarea{min-height:110px;resize:vertical}
+.progress{font-variant-numeric:tabular-nums;color:var(--muted);font-size:14px}
+.tag{display:inline-block;font-size:12px;padding:2px 8px;border-radius:999px;background:var(--accent-soft);color:var(--accent);font-weight:600}
+
+/* Traducir */
+.tr-out{display:grid;gap:8px;min-height:80px}
+.tr-main{font-size:24px;font-weight:500}
+.tr-rom{color:var(--accent);font-weight:600}
+.tr-notes{color:var(--muted);font-size:14.5px}
+.links a{color:var(--accent);font-weight:600}
+
+/* Palabras */
+.cats{display:flex;gap:6px;overflow-x:auto;padding-bottom:4px}
+.cats button{white-space:nowrap}
+.words{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:10px}
+.word{border:1px solid var(--line);border-radius:14px;padding:12px;display:grid;gap:4px;background:var(--sheet);min-width:0}
+.word .ko{font-family:var(--kr);font-size:24px;font-weight:700}
+.word .ro{color:var(--accent);font-size:14px;font-weight:600}
+.word .tr{font-size:15px}
+.word .en{font-size:14px;color:var(--muted)}
+.word .row .btn{padding:6px 10px;min-height:38px;font-size:14px}
+.quiz{display:grid;gap:12px}
+.quiz .q{font-size:34px;font-family:var(--kr);font-weight:700;text-align:center}
+.opts{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.opts button{border:1px solid var(--line);border-radius:12px;background:var(--sheet);padding:12px;min-height:52px;text-align:center}
+.opts button.right{background:var(--accent-soft);border-color:var(--accent);color:var(--accent)}
+.opts button.wrong{border-color:var(--warn);color:var(--warn)}
+.score{font-variant-numeric:tabular-nums}
+
+/* Hablar */
+.say-card{display:grid;gap:10px;text-align:center;padding-block:10px}
+.say-card .phrase{font-size:34px;font-weight:700;line-height:1.25}
+.say-card .rom{color:var(--accent);font-weight:600}
+.heard{min-height:48px;border-radius:12px;padding:10px;background:var(--paper)}
+.meter{height:10px;border-radius:999px;background:var(--line);overflow:hidden}
+.meter i{display:block;height:100%;background:var(--accent);width:0;transition:width .4s}
+@media (prefers-reduced-motion:reduce){.meter i{transition:none}}
+
+/* Hoy */
+.hero{display:grid;gap:12px;background:linear-gradient(135deg,var(--sheet),var(--accent-soft))}
+.hero .hi{font-family:var(--display);font-weight:600;font-size:26px;margin:0}
+.hero .hi .krn{font-family:"Black Han Sans",var(--kr);font-weight:400;color:var(--accent)}
+.stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.stat{background:var(--sheet);border:1px solid var(--line);border-radius:14px;padding:10px;text-align:center;min-width:0}
+.stat b{display:block;font-family:var(--display);font-size:26px;font-weight:600;font-variant-numeric:tabular-nums;color:var(--accent)}
+.stat span{font-size:13px;color:var(--muted)}
+.goalbar{height:12px;border-radius:999px;background:var(--line);overflow:hidden}
+.goalbar i{display:block;height:100%;width:0;background:var(--accent);border-radius:999px;transition:width .4s}
+.lessons{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:10px}
+.lesson{border:1px solid var(--line);border-radius:16px;padding:12px;background:var(--sheet);display:grid;gap:6px;min-width:0}
+.lesson.next{border:2px solid var(--accent)}
+.lesson.done{background:var(--accent-soft)}
+.lesson .lt{font-weight:700;font-size:16px}
+.lesson .lg{font-family:var(--kr);font-size:20px;letter-spacing:4px;word-break:break-all}
+.lesson .row .btn{padding:6px 10px;min-height:40px;font-size:14px}
+.alpha{display:grid;grid-template-columns:repeat(auto-fill,minmax(64px,1fr));gap:6px}
+.alpha button{border:1px solid var(--line);background:var(--sheet);border-radius:12px;padding:6px 2px;display:grid;gap:0;min-height:64px}
+.alpha button b{font-family:var(--kr);font-size:26px;line-height:1.2}
+.alpha button span{font-size:12px;color:var(--muted)}
+.alpha button.learned{border-color:var(--gold)}
+.alpha-tip{min-height:44px;padding:10px;border-radius:12px;background:var(--paper)}
+.flash{display:grid;gap:10px;text-align:center}
+.flash .front{font-family:var(--kr);font-size:56px;font-weight:700;line-height:1.2}
+.flash .back{display:grid;gap:4px}
+.lq .q{font-family:var(--kr);font-size:56px;font-weight:700;text-align:center;line-height:1.2}
+header.top{align-items:center}
+header.top h1{flex:1 1 0;min-width:0}
+header.top p{flex-basis:100%}
+header.top .logo{width:52px;height:52px;border-radius:14px;align-self:center;flex:none;box-shadow:0 2px 8px rgba(176,18,63,.15)}
+@media (max-width:520px){header.top .logo{width:40px;height:40px;border-radius:11px}}
+body{padding-top:env(safe-area-inset-top,0px)}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <header class="top">
+    <img class="logo" src="icons/logo-256.png" alt="">
+    <h1><span class="krn">베레니세의 한글</span> · <span>Hangul de Berenice</span></h1>
+    <p>Coreano e inglés desde cero, a tu ritmo.</p>
+  </header>
+
+  <nav class="tabs" role="tablist" aria-label="Secciones">
+    <button role="tab" id="tab-hoy" aria-selected="true" data-view="hoy"><b>오늘</b>Hoy</button>
+    <button role="tab" id="tab-escribir" aria-selected="false" data-view="escribir"><b>쓰기</b>Escribir</button>
+    <button role="tab" id="tab-palabras" aria-selected="false" data-view="palabras"><b>단어</b>Palabras</button>
+    <button role="tab" id="tab-hablar" aria-selected="false" data-view="hablar"><b>말하기</b>Hablar</button>
+    <button role="tab" id="tab-traducir" aria-selected="false" data-view="traducir"><b>번역</b>Traducir</button>
+  </nav>
+
+  <!-- HOY -->
+  <section class="view" id="view-hoy">
+    <div class="panel hero">
+      <p class="hi"><span class="krn">안녕, 베레니세!</span> Hola, Berenice 💗</p>
+      <p class="hint" id="heroMsg">Empieza por la lección 1. Cada día un poquito.</p>
+      <div class="stats">
+        <div class="stat"><b id="stStreak">0</b><span>días seguidos 🔥</span></div>
+        <div class="stat"><b id="stLetters">0</b><span>letras aprendidas</span></div>
+        <div class="stat"><b id="stDue">0</b><span>para repasar</span></div>
+      </div>
+      <div style="display:grid;gap:6px">
+        <div class="row" style="justify-content:space-between"><span><b>Meta de hoy</b></span><span class="progress" id="bestTxt"></span><span class="progress" id="goalTxt">0 / 10 prácticas</span></div>
+        <div class="goalbar" aria-hidden="true"><i id="goalBar"></i></div>
+      </div>
+      <div class="row">
+        <button class="btn primary" id="btnContinue">Continuar lección</button>
+        <button class="btn" id="btnReview">Repasar</button>
+        <button class="btn" id="btnExam">📝 Examen de práctica</button>
+      </div>
+    </div>
+
+    <div class="panel flash" id="reviewPanel" hidden>
+      <div class="row" style="justify-content:space-between"><h2>Repaso</h2><span class="progress" id="revLeft"></span></div>
+      <p class="hint">¿Recuerdas cómo suena o qué significa? Piensa la respuesta y luego toca "Mostrar".</p>
+      <div class="front" id="revFront"></div>
+      <div class="back" id="revBack" hidden>
+        <div class="tr-rom" id="revRom"></div>
+        <div id="revMeaning"></div>
+      </div>
+      <div class="row" style="justify-content:center" id="revShowRow"><button class="btn primary" id="revShow">Mostrar</button><button class="btn" id="revSound">🔊</button></div>
+      <div class="row" style="justify-content:center" id="revRateRow" hidden>
+        <button class="btn" id="revNo">😅 Todavía no</button>
+        <button class="btn primary" id="revYes">😊 ¡Lo sabía!</button>
+      </div>
+    </div>
+
+    <div class="panel lq" id="lqPanel" hidden>
+      <div class="row" style="justify-content:space-between"><h2 id="lqTitle">Examen</h2><span class="progress" id="lqProg"></span></div>
+      <p class="hint" id="lqAsk"></p>
+      <div class="q" id="lqQ"></div>
+      <div class="opts" id="lqOpts"></div>
+      <div class="row" style="justify-content:space-between"><span class="hint" id="lqFb"></span><button class="btn" id="lqClose">Cerrar</button></div>
+    </div>
+
+    <div class="panel">
+      <h2>Tu ruta paso a paso</h2>
+      <p class="hint" style="margin-bottom:10px">En cada lección: primero aprende a escribir las letras, luego haz el mini examen. Aprobando pasas a la siguiente.</p>
+      <div class="lessons" id="lessons"></div>
+    </div>
+
+    <div class="panel" style="display:grid;gap:10px">
+      <h2>El alfabeto coreano</h2>
+      <p class="hint">Toca una letra para escucharla. Las de borde dorado ya las escribiste.</p>
+      <h3>Vocales</h3><div class="alpha" id="alphaV"></div>
+      <h3>Consonantes</h3><div class="alpha" id="alphaC"></div>
+      <div class="alpha-tip" id="alphaTip">Toca cualquier letra.</div>
+    </div>
+
+    <div class="panel">
+      <h3>Consejos para empezar desde cero</h3>
+      <p class="hint">1. Aprende primero las vocales: ㅏ ㅓ ㅗ ㅜ ㅡ ㅣ. Con ellas ya puedes leer muchísimo.<br>2. Di el sonido en voz alta cada vez que escribas una letra.<br>3. Diez minutos diarios valen más que una hora el domingo. Cuida tu racha 🔥.<br>4. La romanización (letras latinas) es una ayuda; intenta leer el Hangul lo antes posible.</p>
+    </div>
+  </section>
+
+  <!-- ESCRIBIR -->
+  <section class="view" id="view-escribir" hidden>
+    <div class="write-grid">
+      <div class="panel board">
+        <div class="row" style="justify-content:space-between;width:100%;max-width:520px">
+          <div class="seg" role="group" aria-label="Modo de práctica">
+            <button id="m-guide" aria-pressed="true" data-mode="guide">Con guía</button>
+            <button id="m-memory" aria-pressed="false" data-mode="memory">De memoria</button>
+          </div>
+          <span class="progress" id="strokeCount">Trazo 1 de 2</span>
+        </div>
+        <div class="canvas-box"><canvas id="pad" aria-label="Hoja para escribir con el dedo o el lápiz"></canvas></div>
+        <div class="status" id="status" role="status">Dibuja el trazo 1 empezando en el círculo verde.</div>
+        <div class="row" style="justify-content:center">
+          <button class="btn" id="btnAnim">▶ Ver orden de trazos</button>
+          <button class="btn" id="btnUndo">↶ Deshacer</button>
+          <button class="btn" id="btnClear">Borrar</button>
+          <button class="btn" id="btnSound">🔊 Escuchar</button>
+        </div>
+        <div class="row" style="justify-content:center">
+          <button class="btn ghost" id="btnPrev">← Anterior</button>
+          <button class="btn primary" id="btnNext">Siguiente →</button>
+        </div>
+        <button class="btn primary" id="btnToQuiz" hidden>Hacer el examen de la lección →</button>
+        <p class="hint" id="penHint">Con Apple Pencil, la palma sobre la pantalla se ignora. En celular usa el dedo.</p>
+      </div>
+
+      <div style="display:grid;gap:16px;align-content:start">
+        <div class="panel info-card">
+          <div class="big-glyph" id="bigGlyph">ㄱ</div>
+          <div style="min-width:0">
+            <div class="name kr" id="glyphName">기역 (giyeok)</div>
+            <div class="rom" id="glyphRom">g / k</div>
+            <p class="hint" id="glyphTip">Suena como la g de "gato".</p>
+            <div class="seq" id="seq" style="margin-top:6px"></div>
+          </div>
+        </div>
+        <div class="panel">
+          <div class="row" style="justify-content:space-between;margin-bottom:10px">
+            <div class="seg" role="group" aria-label="Qué practicar">
+              <button aria-pressed="true" data-set="cons" id="s-cons">Consonantes</button>
+              <button aria-pressed="false" data-set="vow" id="s-vow">Vocales</button>
+              <button aria-pressed="false" data-set="syl" id="s-syl">Sílabas</button>
+            </div>
+            <span class="progress" id="learnedCount"></span>
+          </div>
+          <div class="picker" id="picker"></div>
+          <div style="margin-top:14px;display:grid;gap:6px">
+            <label for="customWord" class="hint">Practica cualquier sílaba o palabra coreana:</label>
+            <div class="row" style="flex-wrap:nowrap">
+              <input type="text" id="customWord" class="kr" placeholder="Ej.: 사랑해요" autocomplete="off">
+              <button class="btn primary" id="btnCustom">Practicar</button>
+            </div>
+          </div>
+        </div>
+        <div class="panel">
+          <h3>Cómo funciona el Hangul</h3>
+          <p class="hint">Cada sílaba es un bloque: <b>consonante inicial + vocal</b> y, a veces, <b>consonante final</b>. Si la vocal es vertical (ㅏ ㅓ ㅣ) va a la derecha: 가. Si es horizontal (ㅗ ㅜ ㅡ) va abajo: 고. La final siempre va abajo: 각. Los trazos van de arriba a abajo y de izquierda a derecha.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PALABRAS -->
+  <section class="view" id="view-palabras" hidden>
+    <div class="panel">
+      <h2>Palabras y frases</h2>
+      <p class="hint" style="margin-bottom:10px">Coreano, español e inglés. Toca 🔊 para escuchar o ✍️ para practicar su escritura.</p>
+      <div class="cats" id="cats"></div>
+    </div>
+    <div class="words" id="words"></div>
+    <div class="panel quiz">
+      <div class="row" style="justify-content:space-between">
+        <h2>Mini examen</h2>
+        <div class="seg" role="group" aria-label="Tipo de examen">
+          <button aria-pressed="true" data-quiz="ko-es" id="q-koes">Coreano → Español</button>
+          <button aria-pressed="false" data-quiz="es-ko" id="q-esko">Español → Coreano</button>
+          <button aria-pressed="false" data-quiz="es-en" id="q-esen">Escribe en inglés</button>
+        </div>
+      </div>
+      <div class="q" id="quizQ"></div>
+      <div class="opts" id="quizOpts"></div>
+      <div class="row" id="quizType" hidden style="flex-wrap:nowrap">
+        <input type="text" id="quizInput" placeholder="Escribe la palabra en inglés" autocomplete="off" autocapitalize="off">
+        <button class="btn primary" id="quizCheck">Revisar</button>
+      </div>
+      <div class="row" style="justify-content:space-between">
+        <span class="hint" id="quizFeedback"></span>
+        <div class="row"><span class="score progress" id="quizScore">0 / 0</span><button class="btn" id="quizNext">Otra →</button></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- HABLAR -->
+  <section class="view" id="view-hablar" hidden>
+    <div class="panel">
+      <div class="row" style="justify-content:space-between">
+        <h2>Practica tu pronunciación</h2>
+        <div class="seg" role="group" aria-label="Idioma">
+          <button aria-pressed="true" data-lang="ko" id="l-ko">Coreano</button>
+          <button aria-pressed="false" data-lang="en" id="l-en">Inglés</button>
+        </div>
+      </div>
+      <div class="say-card">
+        <div class="phrase" id="sayPhrase"></div>
+        <div class="rom" id="sayRom"></div>
+        <div class="hint" id="sayMeaning"></div>
+      </div>
+      <div class="row" style="justify-content:center">
+        <button class="btn" id="sayListen">🔊 Escuchar</button>
+        <button class="btn" id="saySlow">🐢 Lento</button>
+        <button class="btn primary" id="sayMic" hidden>🎙️ Ahora tú</button>
+        <button class="btn" id="sayNext">Siguiente →</button>
+      </div>
+      <div style="display:grid;gap:8px;margin-top:14px">
+        <div class="heard" id="sayHeard">Escucha la frase y repítela en voz alta.</div>
+        <div class="meter" aria-hidden="true"><i id="sayMeter"></i></div>
+        <p class="hint" id="micNote"></p>
+      </div>
+    </div>
+  </section>
+
+  <!-- TRADUCIR -->
+  <section class="view" id="view-traducir" hidden>
+    <div class="panel" style="display:grid;gap:10px">
+      <h2>Traductor</h2>
+      <div class="row">
+        <label class="hint" for="trFrom">De</label>
+        <select id="trFrom" style="width:auto"><option value="es">Español</option><option value="ko">Coreano</option><option value="en">Inglés</option></select>
+        <button class="btn ghost" id="trSwap" aria-label="Intercambiar idiomas">⇄</button>
+        <label class="hint" for="trTo">a</label>
+        <select id="trTo" style="width:auto"><option value="ko">Coreano</option><option value="en">Inglés</option><option value="es">Español</option></select>
+      </div>
+      <textarea id="trText" placeholder="Escribe aquí. Ej.: ¿Dónde está la estación del metro?">Me gusta aprender coreano</textarea>
+      <div class="row"><button class="btn primary" id="trGo">Traducir</button><button class="btn" id="trSpeak" disabled>🔊 Escuchar traducción</button><button class="btn" id="trWrite" disabled>✍️ Practicar escritura</button></div>
+    </div>
+    <div class="panel tr-out" id="trOut" aria-live="polite">
+      <div class="tr-main" id="trMain"></div>
+      <div class="tr-rom" id="trRom"></div>
+      <div class="tr-notes" id="trNotes">Pulsa Traducir. Te daré la traducción, cómo se lee y una nota de uso.</div>
+      <div class="links hint" id="trLinks" hidden></div>
+    </div>
+  </section>
+</div>
+
+<script>
+(function(){
+"use strict";
+const $ = s => document.querySelector(s);
+const store = {
+  get(k,d){try{const v=localStorage.getItem("hpp:"+k);return v==null?d:JSON.parse(v)}catch(e){return d}},
+  set(k,v){try{localStorage.setItem("hpp:"+k,JSON.stringify(v))}catch(e){}}
+};
+
+/* ---------- Hangul: composición y romanización ---------- */
+const L = "ㄱㄲㄴㄷㄸㄹㅁㅂㅃㅅㅆㅇㅈㅉㅊㅋㅌㅍㅎ".split("");
+const V = "ㅏㅐㅑㅒㅓㅔㅕㅖㅗㅘㅙㅚㅛㅜㅝㅞㅟㅠㅡㅢㅣ".split("");
+const T = ["","ㄱ","ㄲ","ㄳ","ㄴ","ㄵ","ㄶ","ㄷ","ㄹ","ㄺ","ㄻ","ㄼ","ㄽ","ㄾ","ㄿ","ㅀ","ㅁ","ㅂ","ㅄ","ㅅ","ㅆ","ㅇ","ㅈ","ㅊ","ㅋ","ㅌ","ㅍ","ㅎ"];
+const RL = ["g","kk","n","d","tt","r","m","b","pp","s","ss","","j","jj","ch","k","t","p","h"];
+const RV = ["a","ae","ya","yae","eo","e","yeo","ye","o","wa","wae","oe","yo","u","wo","we","wi","yu","eu","ui","i"];
+const RT = ["","k","k","k","n","n","n","t","l","k","m","l","l","l","p","l","m","p","p","t","t","ng","t","t","k","t","p","t"];
+const LINK = {"ㄱ":"g","ㄲ":"kk","ㄴ":"n","ㄷ":"d","ㄹ":"r","ㅁ":"m","ㅂ":"b","ㅅ":"s","ㅆ":"ss","ㅈ":"j","ㅊ":"ch","ㅋ":"k","ㅌ":"t","ㅍ":"p","ㅎ":""};
+const isSyl = c => { const n=c.charCodeAt(0); return n>=0xAC00 && n<=0xD7A3; };
+function decompose(c){ const n=c.charCodeAt(0)-0xAC00; return {l:L[Math.floor(n/588)], v:V[Math.floor((n%588)/28)], t:T[n%28]}; }
+function compose(l,v,t){ return String.fromCharCode(0xAC00 + (L.indexOf(l)*21 + V.indexOf(v))*28 + T.indexOf(t||"")); }
+function romanize(str){
+  const ch=[...str]; let out="";
+  for(let i=0;i<ch.length;i++){
+    const c=ch[i];
+    if(!isSyl(c)){ out+=c; continue; }
+    const d=decompose(c), next=ch[i+1]&&isSyl(ch[i+1])?decompose(ch[i+1]):null;
+    let ini=RL[L.indexOf(d.l)];
+    if(d.l==="ㄹ" && i>0 && isSyl(ch[i-1]) && decompose(ch[i-1]).t==="ㄹ") ini="l";
+    out+=ini+RV[V.indexOf(d.v)];
+    if(d.t){
+      if(next && next.l==="ㅇ" && d.t!=="ㅇ" && LINK[d.t]!==undefined){ out+=LINK[d.t]; /* la final pasa a la siguiente sílaba */ }
+      else out+=RT[T.indexOf(d.t)];
+    }
+  }
+  return out;
+}
+
+/* ---------- Trazos de cada letra (coordenadas 0-100) ---------- */
+function circle(cx,cy,r){ const p=[]; for(let k=0;k<=36;k++){ const a=-Math.PI/2 - k*2*Math.PI/36; p.push([cx+r*Math.cos(a), cy+r*Math.sin(a)]); } return {pts:p,closed:true}; }
+const S = pts => ({pts,closed:false});
+const BASE = {
+ "ㄱ":[S([[20,24],[78,24],[76,58],[66,86]])],
+ "ㄴ":[S([[26,18],[26,78],[84,78]])],
+ "ㄷ":[S([[24,24],[78,24]]),S([[26,24],[26,78],[82,78]])],
+ "ㄹ":[S([[22,18],[76,18],[76,47]]),S([[24,47],[76,47]]),S([[24,47],[24,82],[82,82]])],
+ "ㅁ":[S([[24,22],[24,80]]),S([[24,22],[76,22],[76,80]]),S([[24,80],[76,80]])],
+ "ㅂ":[S([[28,16],[28,84]]),S([[72,16],[72,84]]),S([[28,50],[72,50]]),S([[28,84],[72,84]])],
+ "ㅅ":[S([[50,16],[38,52],[16,84]]),S([[46,46],[84,84]])],
+ "ㅇ":[circle(50,52,30)],
+ "ㅈ":[S([[22,22],[76,22]]),S([[50,22],[38,54],[18,84]]),S([[47,50],[84,84]])],
+ "ㅊ":[S([[50,6],[50,18]]),S([[22,28],[78,28]]),S([[50,28],[38,58],[18,88]]),S([[47,55],[84,88]])],
+ "ㅋ":[S([[20,22],[78,22],[76,58],[66,86]]),S([[24,52],[76,52]])],
+ "ㅌ":[S([[26,20],[78,20]]),S([[26,50],[74,50]]),S([[26,20],[26,80],[82,80]])],
+ "ㅍ":[S([[18,22],[82,22]]),S([[38,22],[34,78]]),S([[62,22],[66,78]]),S([[14,80],[86,80]])],
+ "ㅎ":[S([[50,6],[50,18]]),S([[20,28],[80,28]]),circle(50,62,22)],
+ "ㅏ":[S([[40,8],[40,92]]),S([[40,50],[70,50]])],
+ "ㅑ":[S([[40,8],[40,92]]),S([[40,38],[70,38]]),S([[40,62],[70,62]])],
+ "ㅓ":[S([[28,50],[58,50]]),S([[58,8],[58,92]])],
+ "ㅕ":[S([[28,38],[58,38]]),S([[28,62],[58,62]]),S([[58,8],[58,92]])],
+ "ㅗ":[S([[50,34],[50,62]]),S([[10,62],[90,62]])],
+ "ㅛ":[S([[36,36],[36,62]]),S([[64,36],[64,62]]),S([[10,62],[90,62]])],
+ "ㅜ":[S([[10,40],[90,40]]),S([[50,40],[50,72]])],
+ "ㅠ":[S([[10,40],[90,40]]),S([[36,40],[36,72]]),S([[64,40],[64,72]])],
+ "ㅡ":[S([[10,50],[90,50]])],
+ "ㅣ":[S([[50,8],[50,92]])],
+ "ㅐ":[S([[30,8],[30,92]]),S([[30,50],[52,50]]),S([[64,8],[64,92]])],
+ "ㅒ":[S([[30,8],[30,92]]),S([[30,38],[52,38]]),S([[30,62],[52,62]]),S([[64,8],[64,92]])],
+ "ㅔ":[S([[22,50],[44,50]]),S([[44,8],[44,92]]),S([[68,8],[68,92]])],
+ "ㅖ":[S([[20,38],[44,38]]),S([[20,62],[44,62]]),S([[44,8],[44,92]]),S([[68,8],[68,92]])]
+};
+function boxed(strokes,b){ const [x0,y0,x1,y1]=b; return strokes.map(s=>({closed:s.closed,pts:s.pts.map(([x,y])=>[x0+x/100*(x1-x0), y0+y/100*(y1-y0)])})); }
+function doubled(j){ return [...boxed(BASE[j],[0,0,54,100]), ...boxed(BASE[j],[46,0,100,100])]; }
+const DBL={"ㄲ":"ㄱ","ㄸ":"ㄷ","ㅃ":"ㅂ","ㅆ":"ㅅ","ㅉ":"ㅈ"};
+const COMP={"ㅘ":["ㅗ","ㅏ"],"ㅙ":["ㅗ","ㅐ"],"ㅚ":["ㅗ","ㅣ"],"ㅝ":["ㅜ","ㅓ"],"ㅞ":["ㅜ","ㅔ"],"ㅟ":["ㅜ","ㅣ"],"ㅢ":["ㅡ","ㅣ"]};
+const TCLUSTER={"ㄳ":["ㄱ","ㅅ"],"ㄵ":["ㄴ","ㅈ"],"ㄶ":["ㄴ","ㅎ"],"ㄺ":["ㄹ","ㄱ"],"ㄻ":["ㄹ","ㅁ"],"ㄼ":["ㄹ","ㅂ"],"ㄽ":["ㄹ","ㅅ"],"ㄾ":["ㄹ","ㅌ"],"ㄿ":["ㄹ","ㅍ"],"ㅀ":["ㄹ","ㅎ"],"ㅄ":["ㅂ","ㅅ"]};
+function jamoStrokes(j){ if(BASE[j]) return BASE[j]; if(DBL[j]) return doubled(DBL[j]); if(TCLUSTER[j]){const[a,b]=TCLUSTER[j];return [...boxed(BASE[a],[0,0,54,100]),...boxed(BASE[b],[46,0,100,100])];} return null; }
+const VERT=new Set("ㅏㅐㅑㅒㅓㅔㅕㅖㅣ".split(""));
+function syllableStrokes(c){
+  const {l,v,t}=decompose(c); const out=[]; const fin=!!t;
+  const add=(j,b)=>{ out.push(...boxed(jamoStrokes(j),b)); };
+  if(COMP[v]){
+    const [h,vv]=COMP[v];
+    if(!fin){ add(l,[8,4,54,46]); add(h,[0,24,74,92]); add(vv,[44,0,100,100]); }
+    else { add(l,[8,2,50,32]); add(h,[0,12,72,62]); add(vv,[44,0,100,64]); add(t,[14,62,86,100]); }
+  } else if(VERT.has(v)){
+    if(!fin){ add(l,[2,10,58,90]); add(v,[40,0,100,100]); }
+    else { add(l,[2,4,56,58]); add(v,[40,0,100,62]); add(t,[12,60,88,100]); }
+  } else {
+    if(!fin){ add(l,[16,0,84,56]); add(v,[0,30,100,100]); }
+    else { add(l,[18,0,82,38]); add(v,[0,16,100,64]); add(t,[14,60,86,100]); }
+  }
+  return out;
+}
+
+/* ---------- Información de letras ---------- */
+const CONS = [
+ ["ㄱ","기역","giyeok","g / k","Como la g de \"gato\". Al final suena k."],
+ ["ㄴ","니은","nieun","n","Como la n del español."],
+ ["ㄷ","디귿","digeut","d / t","Entre d y t, suave."],
+ ["ㄹ","리을","rieul","r / l","Una r suave como en \"pero\". Al final suena l."],
+ ["ㅁ","미음","mieum","m","Como la m del español."],
+ ["ㅂ","비읍","bieup","b / p","Entre b y p, sin aire."],
+ ["ㅅ","시옷","siot","s","Como la s. Antes de ㅣ suena \"sh\"."],
+ ["ㅇ","이응","ieung","muda / ng","Al inicio no suena. Al final suena \"ng\" como en inglés \"song\"."],
+ ["ㅈ","지읒","jieut","j","Como \"ch\" suave, casi \"dy\"."],
+ ["ㅊ","치읓","chieut","ch","Como la ch de \"chocolate\", con aire."],
+ ["ㅋ","키읔","kieuk","k","Una k con un soplo de aire."],
+ ["ㅌ","티읕","tieut","t","Una t con un soplo de aire."],
+ ["ㅍ","피읖","pieup","p","Una p con un soplo de aire."],
+ ["ㅎ","히읗","hieut","h","Como la h del inglés \"house\", más suave que la j."],
+ ["ㄲ","쌍기역","ssanggiyeok","kk","ㄱ tensa: sin aire y con fuerza, como la k de \"casa\"."],
+ ["ㄸ","쌍디귿","ssangdigeut","tt","ㄷ tensa, como la t de \"taza\"."],
+ ["ㅃ","쌍비읍","ssangbieup","pp","ㅂ tensa, como la p de \"papá\"."],
+ ["ㅆ","쌍시옷","ssangsiot","ss","ㅅ tensa, una s fuerte."],
+ ["ㅉ","쌍지읒","ssangjieut","jj","ㅈ tensa, una \"ch\" cortita y fuerte."]
+];
+const VOWS = [
+ ["ㅏ","아","a","a","Como la a del español."],
+ ["ㅑ","야","ya","ya","Como \"ya\"."],
+ ["ㅓ","어","eo","eo","Una o muy abierta, casi a. Boca relajada."],
+ ["ㅕ","여","yeo","yeo","\"y\" + la o abierta de ㅓ."],
+ ["ㅗ","오","o","o","Como la o del español, labios redondos."],
+ ["ㅛ","요","yo","yo","Como \"yo\"."],
+ ["ㅜ","우","u","u","Como la u del español."],
+ ["ㅠ","유","yu","yu","Como \"yu\"."],
+ ["ㅡ","으","eu","eu","Di \"u\" pero con los labios estirados, como sonriendo."],
+ ["ㅣ","이","i","i","Como la i del español."],
+ ["ㅐ","애","ae","e","Hoy suena casi igual que ㅔ: una e."],
+ ["ㅒ","얘","yae","ye","Como \"ye\"."],
+ ["ㅔ","에","e","e","Como la e del español."],
+ ["ㅖ","예","ye","ye","Como \"ye\". 예 también significa \"sí\"."]
+];
+const SYLS = ["가","나","다","라","마","바","사","아","자","하","고","누","미","소","한","글","김","밥","물","책","강","빵","왜","뭐"];
+
+/* ---------- Vocabulario ---------- */
+const VOCAB = {
+ "Supervivencia":[
+  ["이거 주세요","Quiero esto, por favor","This one, please"],["얼마예요?","¿Cuánto cuesta?","How much is it?"],["화장실 어디예요?","¿Dónde está el baño?","Where is the bathroom?"],
+  ["도와주세요","¡Ayuda, por favor!","Please help me"],["한국어 잘 못해요","No hablo bien coreano","I don't speak Korean well"],["영어 할 줄 아세요?","¿Habla inglés?","Do you speak English?"],
+  ["다시 한 번 말해 주세요","¿Puede repetirlo, por favor?","Could you say that again, please?"],["천천히 말해 주세요","Hable más despacio, por favor","Please speak slowly"],
+  ["몰라요","No sé","I don't know"],["계산서 주세요","La cuenta, por favor","The check, please"],["병원 어디예요?","¿Dónde está el hospital?","Where is the hospital?"]],
+ "Saludos":[
+  ["안녕하세요","Hola","Hello"],["안녕히 가세요","Adiós (a quien se va)","Goodbye"],["감사합니다","Gracias","Thank you"],
+  ["고마워요","Gracias (cercano)","Thanks"],["죄송합니다","Lo siento / Disculpe","I'm sorry"],["네","Sí","Yes"],["아니요","No","No"],
+  ["만나서 반가워요","Mucho gusto","Nice to meet you"],["괜찮아요","Está bien / No pasa nada","It's okay"],["저는 학생이에요","Soy estudiante","I'm a student"]],
+ "Básicos":[
+  ["물","Agua","Water"],["사람","Persona","Person"],["친구","Amigo / amiga","Friend"],["사랑","Amor","Love"],["학교","Escuela","School"],
+  ["집","Casa","House"],["책","Libro","Book"],["한국어","Idioma coreano","Korean language"],["영어","Inglés","English"],["가족","Familia","Family"]],
+ "Comida":[
+  ["밥","Arroz / comida","Rice / meal"],["김치","Kimchi","Kimchi"],["커피","Café","Coffee"],["빵","Pan","Bread"],
+  ["맛있어요","Está delicioso","It's delicious"],["물 주세요","Agua, por favor","Water, please"],["이거 얼마예요?","¿Cuánto cuesta esto?","How much is this?"],["배고파요","Tengo hambre","I'm hungry"]],
+ "Viaje":[
+  ["지하철","Metro","Subway"],["역","Estación","Station"],["공항","Aeropuerto","Airport"],["호텔","Hotel","Hotel"],["표","Boleto","Ticket"],["여기","Aquí","Here"],["저기","Allá","Over there"]],
+ "Números":[
+  ["하나","Uno (nativo)","One"],["둘","Dos (nativo)","Two"],["셋","Tres (nativo)","Three"],["일","Uno (para fechas y dinero)","One"],
+  ["이","Dos (para fechas y dinero)","Two"],["삼","Tres (para fechas y dinero)","Three"],["십","Diez","Ten"],["백","Cien","One hundred"]],
+ "Sentimientos":[
+  ["행복해요","Estoy feliz","I'm happy"],["피곤해요","Estoy cansada / cansado","I'm tired"],["사랑해요","Te quiero / Te amo","I love you"],
+  ["보고 싶어요","Te extraño","I miss you"],["화이팅!","¡Ánimo! ¡Tú puedes!","You can do it!"],["재미있어요","Es divertido","It's fun"]]
+};
+const ROM_FIX = {"이거 주세요":"igeo juseyo","얼마예요?":"eolmayeyo?","한국어 잘 못해요":"hangugeo jal motaeyo","영어 할 줄 아세요?":"yeongeo hal jul aseyo?","다시 한 번 말해 주세요":"dasi han beon malhae juseyo","계산서 주세요":"gyesanseo juseyo","병원 어디예요?":"byeongwon eodiyeyo?","화장실 어디예요?":"hwajangsil eodiyeyo?","베레니세":"berenise","안녕하세요":"annyeonghaseyo","감사합니다":"gamsahamnida","죄송합니다":"joesonghamnida","괜찮아요":"gwaenchanayo","맛있어요":"masisseoyo","행복해요":"haengbokaeyo","저는 학생이에요":"jeoneun haksaengieyo","한국어":"hangugeo","재미있어요":"jaemiisseoyo","몰라요":"mollayo","만나서 반가워요":"mannaseo bangawoyo","보고 싶어요":"bogo sipeoyo","천천히 말해 주세요":"cheoncheonhi malhae juseyo","학교":"hakgyo"};
+const romOf = ko => ROM_FIX[ko] || romanize(ko);
+const ALLWORDS = Object.entries(VOCAB).flatMap(([cat,arr])=>arr.map(([ko,es,en])=>({cat,ko,es,en})));
+
+/* ---------- Audio: voz de Claude o voz del navegador ---------- */
+let tts=null, dict=null, sample=null;
+function browserSpeak(text,lang,rate){
+  try{
+    if(!("speechSynthesis" in window)) return false;
+    speechSynthesis.cancel();
+    const u=new SpeechSynthesisUtterance(text);
+    u.lang = lang==="ko"?"ko-KR":lang==="en"?"en-US":"es-MX"; u.rate=rate||1;
+    const vs=speechSynthesis.getVoices().filter(v=>v.lang && v.lang.toLowerCase().startsWith(lang));
+    if(vs.length) u.voice=vs.find(v=>/natural|premium|enhanced|google/i.test(v.name))||vs[0];
+    speechSynthesis.speak(u); return true;
+  }catch(e){ return false; }
+}
+async function speak(text,lang,slow){
+  const rate = slow?0.7:1;
+  if(tts){ try{ await tts.speak(text,{language:lang,rate}); return; }catch(e){ if(e&&e.code==="not_granted") tts=null; } }
+  if(!browserSpeak(text,lang,slow?0.6:0.9)) flash("Tu navegador no tiene voz disponible.","bad");
+}
+
+/* ---------- Pizarra de escritura ---------- */
+const pad=$("#pad"), ctx=pad.getContext("2d");
+let size=300, dpr=1;
+const W = { items:[], idx:0, strokes:[], done:[], tries:0, mode:store.get("mode","guide"), anim:null, showHintFor:-1 };
+let penSeen=false, active=null; // {id, pts}
+
+function css(v){ return getComputedStyle(document.documentElement).getPropertyValue(v).trim(); }
+function resize(){
+  const r=pad.getBoundingClientRect(); size=r.width; dpr=Math.min(window.devicePixelRatio||1,3);
+  pad.width=Math.round(size*dpr); pad.height=Math.round(size*dpr); draw();
+}
+function toUnit(e){ const r=pad.getBoundingClientRect(); return [ (e.clientX-r.left)/r.width*100, (e.clientY-r.top)/r.height*100, e.pressure||0.5 ]; }
+function line(pts,w,color,cap){ if(pts.length<2) return; ctx.strokeStyle=color; ctx.lineWidth=w; ctx.lineCap=cap||"round"; ctx.lineJoin="round"; ctx.beginPath(); ctx.moveTo(pts[0][0],pts[0][1]); for(let i=1;i<pts.length;i++) ctx.lineTo(pts[i][0],pts[i][1]); ctx.stroke(); }
+function inkLine(pts,color){ // grosor según la presión del lápiz
+  ctx.strokeStyle=color; ctx.lineCap="round"; ctx.lineJoin="round";
+  for(let i=1;i<pts.length;i++){ const p=pts[i-1],q=pts[i]; ctx.lineWidth=2.2+ (q[2]||0.5)*3.6; ctx.beginPath(); ctx.moveTo(p[0],p[1]); ctx.lineTo(q[0],q[1]); ctx.stroke(); }
+  if(pts.length===1){ ctx.fillStyle=color; ctx.beginPath(); ctx.arc(pts[0][0],pts[0][1],2.5,0,7); ctx.fill(); }
+}
+function arrowAt(s,color){
+  const p=s.pts, a=p[0], b=p[Math.min(3,p.length-1)]; const ang=Math.atan2(b[1]-a[1],b[0]-a[0]);
+  ctx.fillStyle=color; ctx.beginPath(); ctx.arc(a[0],a[1],3.6,0,7); ctx.fill();
+  // flecha a la mitad del trazo
+  const m=Math.floor(p.length/2), m0=p[Math.max(0,m-1)], m1=p[Math.min(p.length-1,m+1)]; const an=Math.atan2(m1[1]-m0[1],m1[0]-m0[0]); const mp=p[m];
+  ctx.save(); ctx.translate(mp[0],mp[1]); ctx.rotate(an); ctx.beginPath(); ctx.moveTo(3.2,0); ctx.lineTo(-2.4,-2.6); ctx.lineTo(-2.4,2.6); ctx.closePath(); ctx.fill(); ctx.restore();
+}
+function numAt(s,i,color){ const a=s.pts[0]; const b=s.pts[Math.min(2,s.pts.length-1)]; let dx=a[0]-b[0], dy=a[1]-b[1]; const n=Math.hypot(dx,dy)||1; const x=a[0]+dx/n*6, y=a[1]+dy/n*6;
+  ctx.fillStyle=color; ctx.font="600 5px IBM Plex Sans, sans-serif"; ctx.textAlign="center"; ctx.textBaseline="middle"; let X=Math.max(3,Math.min(97,x)), Y=Math.max(3,Math.min(97,y));
+  for(let g=0; g<4 && placed.some(q=>Math.hypot(q[0]-X,q[1]-Y)<5); g++){ Y = Y+5>97 ? Y-10 : Y+5; }
+  placed.push([X,Y]); ctx.fillText(String(i+1),X,Y); }
+let placed=[];
+function draw(){
+  placed=[];
+  ctx.setTransform(1,0,0,1,0,0); ctx.clearRect(0,0,pad.width,pad.height);
+  ctx.setTransform(pad.width/100,0,0,pad.height/100,0,0);
+  // cuadrícula de cuaderno
+  ctx.setLineDash([1.6,1.6]); line([[50,0],[50,100]],0.35,css("--grid")); line([[0,50],[100,50]],0.35,css("--grid")); ctx.setLineDash([]);
+  const guideC=css("--guide"), numC=css("--guide-num"), inkC=css("--ink"), acc=css("--accent");
+  const strokes=W.strokes;
+  if(W.anim){ // animación del orden
+    const {k,t}=W.anim;
+    strokes.forEach(s=>line(s.pts,6.5,guideC));
+    for(let i=0;i<k;i++){ line(strokes[i].pts,6.5,acc); numAt(strokes[i],i,numC); }
+    if(strokes[k]){ const p=strokes[k].pts, n=Math.max(2,Math.ceil(p.length*t)); line(p.slice(0,n),6.5,acc); numAt(strokes[k],k,numC); }
+    return;
+  }
+  const next=W.done.length;
+  if(W.mode==="guide"){
+    strokes.forEach((s,i)=>{ line(s.pts,6.5,guideC); });
+    strokes.forEach((s,i)=>{ if(i>=next) numAt(s,i,i===next?numC:css("--muted")); });
+    if(strokes[next]) arrowAt(strokes[next],acc);
+  } else if(W.showHintFor===next && strokes[next]){
+    line(strokes[next].pts,6.5,guideC); arrowAt(strokes[next],acc);
+  }
+  W.done.forEach(pts=>inkLine(pts,inkC));
+  if(active) inkLine(active.pts,inkC);
+}
+function resample(pts,n){
+  const P=pts.map(p=>[p[0],p[1]]); let len=0; for(let i=1;i<P.length;i++) len+=Math.hypot(P[i][0]-P[i-1][0],P[i][1]-P[i-1][1]);
+  if(len===0) return Array.from({length:n},()=>P[0]);
+  const step=len/(n-1), out=[P[0]]; let acc=0;
+  for(let i=1;i<P.length;i++){
+    let a=P[i-1], b=P[i], d=Math.hypot(b[0]-a[0],b[1]-a[1]);
+    while(acc+d>=step && out.length<n){ const t=(step-acc)/d; const q=[a[0]+t*(b[0]-a[0]),a[1]+t*(b[1]-a[1])]; out.push(q); a=q; d=Math.hypot(b[0]-a[0],b[1]-a[1]); acc=0; }
+    acc+=d;
+  }
+  while(out.length<n) out.push(P[P.length-1]);
+  return out;
+}
+const pathLen = p => p.reduce((s,q,i)=>i?s+Math.hypot(q[0]-p[i-1][0],q[1]-p[i-1][1]):0,0);
+function judge(user,exp){
+  const n=32, u=resample(user,n), e=resample(exp.pts,n);
+  const el=pathLen(exp.pts), tol=Math.max(7, Math.min(13, 6+el*0.12));
+  if(pathLen(user)<el*0.45) return "short";
+  if(exp.closed){
+    const near=(a,B)=>a.reduce((s,p)=>s+Math.min(...B.map(q=>Math.hypot(p[0]-q[0],p[1]-q[1]))),0)/a.length;
+    return (near(u,e)+near(e,u))/2 < tol ? "ok" : "far";
+  }
+  let f=0,r=0; for(let i=0;i<n;i++){ f+=Math.hypot(u[i][0]-e[i][0],u[i][1]-e[i][1]); r+=Math.hypot(u[i][0]-e[n-1-i][0],u[i][1]-e[n-1-i][1]); }
+  f/=n; r/=n;
+  if(f<tol) return "ok"; if(r<tol) return "reverse"; return "far";
+}
+function setStatus(msg,kind){ const s=$("#status"); s.textContent=msg; s.className="status"+(kind?" "+kind:""); }
+let flashT; function flash(msg,kind){ setStatus(msg,kind); }
+function updateCount(){ const n=W.strokes.length, k=Math.min(W.done.length+1,n); $("#strokeCount").textContent = W.done.length>=n ? `${n} de ${n} trazos` : `Trazo ${k} de ${n}`; }
+
+pad.addEventListener("pointerdown",e=>{
+  if(W.anim) return;
+  if(e.pointerType==="pen") penSeen=true;
+  if(penSeen && e.pointerType==="touch") return; // rechazo de palma
+  if(active) return;
+  if(W.done.length>=W.strokes.length) return;
+  e.preventDefault(); pad.setPointerCapture(e.pointerId);
+  active={id:e.pointerId,pts:[toUnit(e)]}; draw();
+});
+pad.addEventListener("pointermove",e=>{
+  if(!active||e.pointerId!==active.id) return; e.preventDefault();
+  const evs=e.getCoalescedEvents?e.getCoalescedEvents():[e]; evs.forEach(ev=>active.pts.push(toUnit(ev))); draw();
+});
+function endStroke(e){
+  if(!active||e.pointerId!==active.id) return;
+  const pts=active.pts; active=null;
+  const exp=W.strokes[W.done.length]; if(!exp){ draw(); return; }
+  const res=judge(pts,exp);
+  if(res==="ok"){
+    W.done.push(pts); W.tries=0; W.showHintFor=-1;
+    if(W.done.length===W.strokes.length) finishItem();
+    else setStatus(`¡Bien! Ahora el trazo ${W.done.length+1}.`,"ok");
+  } else {
+    W.tries++; if(W.exam) W.exam.errs++;
+    const msg = res==="reverse" ? "Casi: ese trazo va en la dirección contraria. Empieza en el círculo verde." :
+                res==="short" ? "Ese trazo quedó corto. Dibújalo completo, de punta a punta." :
+                `Ese no es el trazo ${W.done.length+1}. Sigue la guía e inténtalo otra vez.`;
+    if(W.mode==="memory" && W.tries>=2){ W.showHintFor=W.done.length; setStatus("Te muestro una pista para este trazo.","bad"); }
+    else setStatus(msg,"bad");
+  }
+  updateCount(); draw();
+}
+pad.addEventListener("pointerup",endStroke);
+pad.addEventListener("pointercancel",e=>{ if(active&&e.pointerId===active.id){ active=null; draw(); } });
+// Evita que iOS haga scroll o zoom mientras escribes
+pad.addEventListener("touchstart",e=>e.preventDefault(),{passive:false});
+pad.addEventListener("touchmove",e=>e.preventDefault(),{passive:false});
+
+function finishItem(){
+  const it=W.items[W.idx];
+  const learned=store.get("learned",{}); learned[it.ch]=true; store.set("learned",learned);
+  addToDeck(it.ch);
+  if(W.exam){ if(W.idx<W.items.length-1){ setStatus("¡Bien! Sigue con la siguiente sílaba.","ok"); setTimeout(()=>{ W.idx++; loadCurrent(); },900); } else { setStatus("¡Listo! Volviendo al examen…","done"); setTimeout(examWriteDone,900); } return; }
+  bump();
+  const lesson = W.label.startsWith("lesson:") ? LESSONS[+W.label.slice(7)] : null;
+  const last = W.idx>=W.items.length-1;
+  if(lesson && last){ setStatus(`¡Terminaste de escribir la lección "${lesson.title}"! Ahora el examen.`,"done"); $("#btnToQuiz").hidden=false; }
+  else setStatus(W.mode==="memory" ? `¡Perfecto, Berenice! Escribiste ${it.ch} de memoria. ⭐` : `¡Muy bien! Escribiste ${it.ch}.${W.items.length>1&&!last?" Vamos con la siguiente.":" Prueba ahora \"De memoria\"."}`, "done");
+  speak(it.say, "ko");
+  renderPicker(); renderSeq(); renderHoy();
+  if((lesson||W.label==="word") && !last){ const at=W.idx; setTimeout(()=>{ if(W.idx===at && W.done.length===W.strokes.length){ W.idx++; loadCurrent(); } },1500); }
+}
+
+function itemFor(ch){
+  const c=CONS.find(x=>x[0]===ch); if(c) return {ch, kind:"cons", strokes:jamoStrokes(ch), name:`${c[1]} (${c[2]})`, rom:c[3], tip:c[4], say:compose(ch,"ㅏ","")};
+  const v=VOWS.find(x=>x[0]===ch); if(v) return {ch, kind:"vow", strokes:jamoStrokes(ch), name:`${v[1]}`, rom:v[3], tip:v[4]+` Se escribe con ㅇ muda: ${v[1]}.`, say:v[1]};
+  if(isSyl(ch)){ const d=decompose(ch); const parts=[d.l,d.v,d.t].filter(Boolean).join(" + ");
+    return {ch, kind:"syl", strokes:syllableStrokes(ch), name:ch, rom:romanize(ch), tip:`Se arma así: ${parts}. Escribe primero la inicial, luego la vocal${d.t?" y al final la consonante de abajo":""}.`, say:ch}; }
+  return null;
+}
+function loadItems(list, idx, label){
+  W.items=list.map(itemFor).filter(Boolean); W.idx=Math.max(0,Math.min(idx||0,W.items.length-1)); W.label=label||"";
+  loadCurrent();
+}
+function loadCurrent(){
+  cancelAnim();
+  const it=W.items[W.idx]; if(!it) return;
+  $("#btnToQuiz").hidden=true;
+  W.strokes=it.strokes; W.done=[]; W.tries=0; W.showHintFor=-1; active=null;
+  $("#bigGlyph").textContent=it.ch; $("#glyphName").textContent=it.name; $("#glyphRom").textContent=it.rom; $("#glyphTip").textContent=it.tip;
+  setStatus(W.mode==="guide" ? "Dibuja el trazo 1 empezando en el círculo verde." : "Escríbelo de memoria. Si fallas dos veces te doy una pista.");
+  $("#btnPrev").disabled=W.idx===0; $("#btnNext").disabled=W.idx>=W.items.length-1;
+  updateCount(); renderPicker(); renderSeq(); draw();
+}
+function renderSeq(){
+  const box=$("#seq"); box.innerHTML="";
+  if(W.items.length<=1 || !(W.label==="word"||W.label==="exam"||W.label.startsWith("lesson:"))) return;
+  const learned=store.get("learned",{});
+  W.items.forEach((it,i)=>{ const s=document.createElement("span"); s.textContent=it.ch; if(i===W.idx) s.className="cur"; else if(learned[it.ch]) s.className="ok"; box.appendChild(s); });
+}
+let curSet=store.get("set","cons");
+function renderPicker(){
+  const p=$("#picker"); p.innerHTML=""; const learned=store.get("learned",{});
+  const list = curSet==="cons"?CONS.map(c=>[c[0],c[3]]) : curSet==="vow"?VOWS.map(v=>[v[0],v[2]]) : SYLS.map(s=>[s,romanize(s)]);
+  list.forEach(([ch,r],i)=>{
+    const b=document.createElement("button"); b.innerHTML=`${ch}<small>${r}</small>`; b.setAttribute("aria-label",`${ch}, ${r}`);
+    if(learned[ch]) b.classList.add("learned");
+    const cur=W.items[W.idx]; if(cur&&cur.ch===ch&&W.label===curSet) b.setAttribute("aria-current","true");
+    b.onclick=()=>{ if(W.exam){ W.mode=W.exam.prevMode; W.exam=null; } loadItems(list.map(x=>x[0]), i, curSet); store.set("pos:"+curSet,i); };
+    p.appendChild(b);
+  });
+  const n=list.filter(([ch])=>learned[ch]).length; $("#learnedCount").textContent=`${n} de ${list.length} aprendidas`;
+}
+document.querySelectorAll("[data-set]").forEach(b=>b.onclick=()=>{
+  curSet=b.dataset.set; store.set("set",curSet);
+  document.querySelectorAll("[data-set]").forEach(x=>x.setAttribute("aria-pressed",String(x===b)));
+  const list = curSet==="cons"?CONS.map(c=>c[0]) : curSet==="vow"?VOWS.map(v=>v[0]) : SYLS;
+  loadItems(list, store.get("pos:"+curSet,0), curSet);
+});
+document.querySelectorAll("[data-mode]").forEach(b=>b.onclick=()=>{
+  W.mode=b.dataset.mode; store.set("mode",W.mode);
+  document.querySelectorAll("[data-mode]").forEach(x=>x.setAttribute("aria-pressed",String(x===b)));
+  loadCurrent();
+});
+function cancelAnim(){ if(W.anim){ cancelAnimationFrame(W.anim.raf); W.anim=null; } }
+$("#btnAnim").onclick=()=>{
+  cancelAnim(); W.done=[]; updateCount();
+  const reduce=matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const per=reduce?250:750; const start=performance.now();
+  const tick=now=>{ const el=now-start, k=Math.floor(el/per), t=(el%per)/per;
+    if(k>=W.strokes.length){ W.anim=null; setStatus("Ahora tú: dibuja el trazo 1."); draw(); return; }
+    W.anim={k,t,raf:requestAnimationFrame(tick)}; draw(); };
+  W.anim={k:0,t:0,raf:requestAnimationFrame(tick)};
+  setStatus("Mira el orden: de arriba a abajo, de izquierda a derecha.");
+};
+$("#btnUndo").onclick=()=>{ cancelAnim(); W.done.pop(); W.tries=0; updateCount(); setStatus(`Dibuja el trazo ${W.done.length+1}.`); draw(); };
+$("#btnClear").onclick=()=>loadCurrent();
+$("#btnSound").onclick=()=>{ const it=W.items[W.idx]; if(it) speak(it.say,"ko"); };
+$("#btnPrev").onclick=()=>{ if(W.idx>0){ W.idx--; if(W.label!=="word") store.set("pos:"+W.label,W.idx); loadCurrent(); } };
+$("#btnNext").onclick=()=>{ if(W.idx<W.items.length-1){ W.idx++; if(W.label!=="word") store.set("pos:"+W.label,W.idx); loadCurrent(); } };
+function practiceWord(text){
+  const chars=[...text].filter(isSyl);
+  if(!chars.length){ setStatus("Escribe al menos una sílaba en coreano (por ejemplo 사랑).","bad"); return; }
+  loadItems(chars,0,"word"); showView("escribir"); window.scrollTo({top:0,behavior:"smooth"});
+}
+$("#btnCustom").onclick=()=>practiceWord($("#customWord").value);
+$("#customWord").addEventListener("keydown",e=>{ if(e.key==="Enter") practiceWord(e.target.value); });
+
+/* ---------- Pestañas ---------- */
+function showView(name){
+  if(W.exam && name!=="escribir" && name!=="hoy"){ W.mode=W.exam.prevMode; W.exam=null; }
+  document.querySelectorAll("nav.tabs button").forEach(b=>b.setAttribute("aria-selected",String(b.dataset.view===name)));
+  document.querySelectorAll("section.view").forEach(s=>s.hidden = s.id!=="view-"+name);
+  if(name==="escribir") requestAnimationFrame(resize);
+  if(name==="hoy") renderHoy();
+  if(location.hash!=="#"+name) history.replaceState(null,"","#"+name);
+  store.set("view",name);
+}
+document.querySelectorAll("nav.tabs button").forEach(b=>b.onclick=()=>showView(b.dataset.view));
+
+/* ---------- Palabras ---------- */
+let curCat=store.get("cat","Saludos");
+function renderCats(){
+  const c=$("#cats"); c.innerHTML="";
+  Object.keys(VOCAB).forEach(k=>{ const b=document.createElement("button"); b.className="btn"; b.textContent=k; b.setAttribute("aria-pressed",String(k===curCat));
+    b.onclick=()=>{ curCat=k; store.set("cat",k); renderCats(); renderWords(); }; c.appendChild(b); });
+}
+function renderWords(){
+  const w=$("#words"); w.innerHTML="";
+  VOCAB[curCat].forEach(([ko,es,en])=>{
+    const d=document.createElement("div"); d.className="word";
+    d.innerHTML=`<div class="ko"></div><div class="ro"></div><div class="tr"></div><div class="en"></div>
+      <div class="row"><button class="btn" data-a="ko">🔊 Coreano</button><button class="btn" data-a="en">🔊 Inglés</button><button class="btn" data-a="w">✍️ Escribir</button></div>`;
+    d.querySelector(".ko").textContent=ko; d.querySelector(".ro").textContent=romOf(ko); d.querySelector(".tr").textContent=es; d.querySelector(".en").textContent="EN: "+en;
+    d.querySelector('[data-a="ko"]').onclick=()=>speak(ko,"ko");
+    d.querySelector('[data-a="en"]').onclick=()=>speak(en,"en");
+    d.querySelector('[data-a="w"]').onclick=()=>practiceWord(ko);
+    w.appendChild(d);
+  });
+}
+let quizMode="ko-es", quizItem=null, qRight=0, qTotal=0, qAnswered=false;
+const shuffle=a=>{ for(let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; } return a; };
+function newQuiz(){
+  qAnswered=false; $("#quizFeedback").textContent="";
+  quizItem=ALLWORDS[Math.floor(Math.random()*ALLWORDS.length)];
+  const typing = quizMode==="es-en";
+  $("#quizOpts").hidden=typing; $("#quizType").hidden=!typing;
+  const q=$("#quizQ");
+  if(quizMode==="ko-es"){ q.textContent=quizItem.ko; q.className="q kr"; }
+  else { q.textContent=quizItem.es; q.className="q"; q.style.fontFamily="var(--body)"; }
+  if(quizMode==="ko-es") q.style.fontFamily="";
+  if(typing){ $("#quizInput").value=""; return; }
+  const others=shuffle(ALLWORDS.filter(x=>x!==quizItem && x.es!==quizItem.es)).slice(0,3);
+  const opts=shuffle([quizItem,...others]); const box=$("#quizOpts"); box.innerHTML="";
+  opts.forEach(o=>{ const b=document.createElement("button");
+    if(quizMode==="ko-es"){ b.textContent=o.es; } else { b.textContent=o.ko; b.className="kr"; b.style.fontSize="20px"; }
+    b.onclick=()=>{ if(qAnswered) return; qAnswered=true; qTotal++;
+      const ok=o===quizItem; if(ok){ qRight++; addToDeck(quizItem.ko); } bump();
+      b.classList.add(ok?"right":"wrong");
+      [...box.children].forEach((c,i)=>{ if(opts[i]===quizItem) c.classList.add("right"); });
+      $("#quizFeedback").textContent = ok ? `¡Correcto! ${quizItem.ko} (${romOf(quizItem.ko)})` : `Era: ${quizItem.ko} = ${quizItem.es}`;
+      $("#quizScore").textContent=`${qRight} / ${qTotal}`; speak(quizItem.ko,"ko"); };
+    box.appendChild(b); });
+}
+const norm=s=>s.toLowerCase().replace(/[^a-z' ]/g,"").replace(/\s+/g," ").trim();
+function checkTyped(){
+  if(qAnswered) return; const v=norm($("#quizInput").value); if(!v) return;
+  qAnswered=true; qTotal++;
+  const answers=quizItem.en.split("/").map(norm); const ok=answers.includes(v) || answers.some(a=>a.replace(/^(the|a|an) /,"")===v);
+  if(ok){ qRight++; addToDeck(quizItem.ko); } bump();
+  $("#quizFeedback").textContent= ok ? `¡Correcto! "${quizItem.en}". En coreano: ${quizItem.ko}` : `Se escribe: "${quizItem.en}". En coreano: ${quizItem.ko}`;
+  $("#quizScore").textContent=`${qRight} / ${qTotal}`; speak(quizItem.en,"en");
+}
+$("#quizCheck").onclick=checkTyped; $("#quizInput").addEventListener("keydown",e=>{ if(e.key==="Enter") checkTyped(); });
+$("#quizNext").onclick=newQuiz;
+document.querySelectorAll("[data-quiz]").forEach(b=>b.onclick=()=>{ quizMode=b.dataset.quiz; document.querySelectorAll("[data-quiz]").forEach(x=>x.setAttribute("aria-pressed",String(x===b))); newQuiz(); });
+
+/* ---------- Hablar ---------- */
+let sayLang="ko", sayIdx=0;
+const sayList=()=>ALLWORDS.filter(w=>w.ko.length>1 || sayLang==="en");
+function renderSay(){
+  const list=sayList(); const w=list[sayIdx%list.length];
+  if(sayLang==="ko"){ $("#sayPhrase").textContent=w.ko; $("#sayPhrase").className="phrase kr"; $("#sayRom").textContent=romOf(w.ko); $("#sayMeaning").textContent=w.es; }
+  else { $("#sayPhrase").textContent=w.en; $("#sayPhrase").className="phrase"; $("#sayRom").textContent=""; $("#sayMeaning").textContent=w.es; }
+  $("#sayHeard").textContent= dict ? "Escucha, luego toca \"Ahora tú\" y dila en voz alta." : "Escucha la frase y repítela en voz alta varias veces.";
+  $("#sayMeter").style.width="0";
+}
+const curSay=()=>{ const list=sayList(); return list[sayIdx%list.length]; };
+$("#sayListen").onclick=()=>{ const w=curSay(); speak(sayLang==="ko"?w.ko:w.en,sayLang,false); };
+$("#saySlow").onclick=()=>{ const w=curSay(); speak(sayLang==="ko"?w.ko:w.en,sayLang,true); };
+$("#sayNext").onclick=()=>{ sayIdx=Math.floor(Math.random()*sayList().length); renderSay(); };
+document.querySelectorAll("[data-lang]").forEach(b=>b.onclick=()=>{ sayLang=b.dataset.lang; document.querySelectorAll("[data-lang]").forEach(x=>x.setAttribute("aria-pressed",String(x===b))); sayIdx=0; renderSay(); });
+function similarity(a,b){
+  const clean=s=>s.toLowerCase().replace(/[^\p{L}\p{N}]/gu,"");
+  a=[...clean(a)]; b=[...clean(b)]; if(!a.length||!b.length) return 0;
+  const dp=Array.from({length:a.length+1},(_,i)=>[i]); for(let j=1;j<=b.length;j++) dp[0][j]=j;
+  for(let i=1;i<=a.length;i++) for(let j=1;j<=b.length;j++) dp[i][j]=Math.min(dp[i-1][j]+1,dp[i][j-1]+1,dp[i-1][j-1]+(a[i-1]===b[j-1]?0:1));
+  return Math.max(0,1-dp[a.length][b.length]/Math.max(a.length,b.length));
+}
+let heard="", listening=false, wasListening=false;
+$("#sayMic").onclick=()=>{
+  if(!dict) return;
+  if(listening){ dict.stop().catch(()=>{}); return; }
+  heard=""; $("#sayHeard").textContent="Te escucho…";
+  dict.start({language: sayLang==="ko"?"ko":"en"}).catch(e=>{
+    if(e&&e.code==="not_granted"){ $("#sayMic").hidden=true; $("#micNote").textContent="El micrófono no está permitido. Puedes seguir practicando escuchando y repitiendo."; }
+    else $("#sayHeard").textContent="No pude usar el micrófono ahora. Inténtalo otra vez.";
+  });
+};
+function gradeSpeech(){
+  const w=curSay(), target=sayLang==="ko"?w.ko:w.en; const sc=similarity(heard,target);
+  $("#sayMeter").style.width=Math.round(sc*100)+"%"; if(heard) bump();
+  const pct=Math.round(sc*100);
+  $("#sayHeard").textContent = heard ? `Entendí: "${heard}". ${pct>=85?"¡Excelente pronunciación!":pct>=60?"¡Bien! Ya casi.":"Escucha otra vez en lento e inténtalo de nuevo."} (${pct}%)` : "No escuché nada. Acércate al micrófono e inténtalo otra vez.";
+}
+
+/* ---------- Traducir ---------- */
+const LN={es:"español",ko:"coreano",en:"inglés"};
+let lastTr=null;
+$("#trSwap").onclick=()=>{ const a=$("#trFrom").value,b=$("#trTo").value; $("#trFrom").value=b; $("#trTo").value=a; if($("#trFrom").value===$("#trTo").value) $("#trTo").value=a==="ko"?"es":"ko"; };
+function localLookup(text){
+  const t=text.trim().toLowerCase().replace(/[¿?¡!.,]/g,"");
+  return ALLWORDS.find(w=>[w.ko,w.es,w.en].some(x=>x.toLowerCase().replace(/[¿?¡!.,]/g,"").split(" / ").includes(t) || x.toLowerCase().replace(/[¿?¡!.,]/g,"")===t));
+}
+function showLinks(text){
+  const q=encodeURIComponent(text), sl=$("#trFrom").value, tl=$("#trTo").value;
+  const l=$("#trLinks"); l.hidden=false;
+  l.innerHTML=`Abrir en: <a target="_blank" rel="noopener" href="https://papago.naver.com/?sk=${sl}&tk=${tl}&st=${q}">Papago</a> · <a target="_blank" rel="noopener" href="https://translate.google.com/?sl=${sl}&tl=${tl}&text=${q}">Google Translate</a>`;
+}
+async function translate(){
+  const text=$("#trText").value.trim(); if(!text) return;
+  const from=$("#trFrom").value, to=$("#trTo").value;
+  if(from===to){ $("#trNotes").textContent="Elige dos idiomas diferentes."; return; }
+  $("#trMain").textContent=""; $("#trRom").textContent=""; $("#trLinks").hidden=true; $("#trSpeak").disabled=true; $("#trWrite").disabled=true;
+  if(sample){
+    $("#trNotes").textContent="Traduciendo…"; $("#trGo").disabled=true;
+    try{
+      const prompt=`Eres un profesor de idiomas para una hispanohablante principiante. Traduce del ${LN[from]} al ${LN[to]} de forma natural y educada (registro -요 en coreano si aplica).
+Responde SOLO con JSON: {"translation": string, "romanization": string (romanización revisada si la traducción está en coreano, si no ""), "pronunciation_es": string (cómo se pronuncia escrito para hispanohablantes, breve), "note": string (una nota corta en español sobre gramática, vocabulario clave o uso; máx 2 frases)}.
+Texto: """${text}"""`;
+      const r=await sample.json(prompt,{modelTier:"quick"});
+      lastTr={text:r.translation||"",lang:to}; bump();
+      $("#trMain").textContent=r.translation||""; $("#trMain").className="tr-main"+(to==="ko"?" kr":"");
+      $("#trRom").textContent=[r.romanization,r.pronunciation_es?`Se pronuncia: ${r.pronunciation_es}`:""].filter(Boolean).join(" · ");
+      $("#trNotes").textContent=r.note||"";
+      $("#trSpeak").disabled=!lastTr.text; $("#trWrite").disabled=!(to==="ko"||from==="ko");
+    }catch(e){
+      if(e&&e.code==="not_granted"){ sample=null; $("#trNotes").textContent="Sin permiso para traducir con Claude. Puedes usar los enlaces de abajo."; }
+      else if(e&&e.code==="rate_limited") $("#trNotes").textContent="Demasiadas traducciones seguidas. Espera un momento.";
+      else $("#trNotes").textContent="No pude traducir ahora. Prueba de nuevo o usa los enlaces de abajo.";
+      showLinks(text);
+    }finally{ $("#trGo").disabled=false; }
+    return;
+  }
+  const w=localLookup(text);
+  if(w){ const out= to==="ko"?w.ko:to==="en"?w.en:w.es; lastTr={text:out,lang:to};
+    $("#trMain").textContent=out; $("#trRom").textContent= to==="ko"?romOf(w.ko):""; $("#trNotes").textContent="Encontrado en tu lista de palabras."; $("#trSpeak").disabled=false; $("#trWrite").disabled=false; }
+  else {
+    $("#trNotes").textContent="Traduciendo…"; $("#trGo").disabled=true;
+    try{
+      const r=await fetch(`https://api.mymemory.translated.net/get?q=${encodeURIComponent(text.slice(0,450))}&langpair=${from}|${to}`);
+      const j=await r.json(); const tr=(j&&j.responseData&&j.responseData.translatedText)||"";
+      if(!tr || j.responseStatus!==200) throw new Error("sin traducción");
+      const out=tr.replace(/&#39;/g,"'").replace(/&quot;/g,'"').replace(/&amp;/g,"&");
+      lastTr={text:out,lang:to}; bump();
+      $("#trMain").textContent=out; $("#trMain").className="tr-main"+(to==="ko"?" kr":"");
+      $("#trRom").textContent= to==="ko" ? romOf(out) : "";
+      $("#trNotes").textContent="Traducción automática. Para comparar, ábrela también en:";
+      $("#trSpeak").disabled=false; $("#trWrite").disabled=!(to==="ko"||from==="ko");
+    }catch(e){ $("#trNotes").textContent="No pude traducir ahora (¿sin internet?). Ábrela en un traductor:"; }
+    finally{ $("#trGo").disabled=false; }
+  }
+  showLinks(text);
+}
+$("#trGo").onclick=translate;
+$("#trSpeak").onclick=()=>{ if(lastTr) speak(lastTr.text,lastTr.lang); };
+$("#trWrite").onclick=()=>{ const ko = $("#trTo").value==="ko" ? lastTr&&lastTr.text : $("#trText").value; practiceWord(ko||""); };
+
+/* ---------- Hoy: lecciones, repaso espaciado y racha ---------- */
+const LESSONS=[
+ {title:"Vocales básicas", items:["ㅏ","ㅓ","ㅗ","ㅜ","ㅡ","ㅣ"], kind:"jamo", tip:"Las 6 vocales base. Con ellas empiezas a leer."},
+ {title:"Vocales con Y", items:["ㅑ","ㅕ","ㅛ","ㅠ"], kind:"jamo", tip:"Un trazo extra = un sonido Y delante."},
+ {title:"Primeras consonantes", items:["ㄱ","ㄴ","ㄷ","ㄹ","ㅁ"], kind:"jamo", tip:"Las más usadas del coreano."},
+ {title:"Más consonantes", items:["ㅂ","ㅅ","ㅇ","ㅈ","ㅎ"], kind:"jamo", tip:"ㅇ es muda al inicio de la sílaba."},
+ {title:"Tus primeras sílabas", items:["가","나","다","마","바","사","아","하"], kind:"syl", tip:"Consonante + vocal = sílaba."},
+ {title:"Tu nombre en coreano", items:["베","레","니","세"], kind:"syl", tip:"Berenice se escribe 베레니세 (be-re-ni-se)."},
+ {title:"Consonantes con aire", items:["ㅊ","ㅋ","ㅌ","ㅍ"], kind:"jamo", tip:"Se pronuncian soltando un soplo de aire."},
+ {title:"Vocales ㅐ y ㅔ", items:["ㅐ","ㅔ","ㅒ","ㅖ"], kind:"jamo", tip:"ㅐ y ㅔ hoy suenan casi igual: e."},
+ {title:"Consonantes dobles", items:["ㄲ","ㄸ","ㅃ","ㅆ","ㅉ"], kind:"jamo", tip:"Sonidos tensos, sin aire."},
+ {title:"Consonante final (받침)", items:["각","안","말","밥","강","집"], kind:"syl", tip:"La consonante de abajo cierra la sílaba."},
+ {title:"Primeras palabras", items:["물","사랑","친구","학교","책","김치"], kind:"word", tip:"Palabras cortas para leer y escribir."},
+ {title:"Frases de supervivencia", items:["이거 주세요","얼마예요?","화장실 어디예요?","도와주세요","한국어 잘 못해요","감사합니다"], kind:"word", tip:"Lo esencial si viajas a Corea."}
+];
+const DAY=()=>{ const d=new Date(); return Math.floor((d.getTime()-d.getTimezoneOffset()*60000)/864e5); };
+const GOAL=10, INTERVALS=[1,2,4,7,15,30];
+function infoFor(key){
+  const w=ALLWORDS.find(x=>x.ko===key);
+  if(w) return {front:key, rom:romOf(key), meaning:`${w.es} · EN: ${w.en}`, say:key};
+  const it=itemFor(key); if(!it) return {front:key, rom:romanize(key), meaning:"", say:key};
+  return {front:key, rom:it.rom, meaning: it.kind==="syl" ? `Sílaba: ${it.tip.split(".")[0].replace("Se arma así: ","")}` : it.tip, say:it.say};
+}
+function addToDeck(key){ const d=store.get("deck",{}); if(!d[key]){ d[key]={box:0,due:DAY()+1}; store.set("deck",d); } }
+function dueKeys(){ const d=store.get("deck",{}), t=DAY(); return Object.keys(d).filter(k=>d[k].due<=t); }
+function bump(){
+  const t=DAY(); let a=store.get("act",{day:t,n:0}); if(a.day!==t) a={day:t,n:0}; a.n++; store.set("act",a);
+  if(a.n===GOAL){ const st=store.get("streak",{last:-1,n:0}); if(st.last!==t){ st.n = st.last===t-1 ? st.n+1 : 1; st.last=t; store.set("streak",st); } setStatusGoal(); }
+  renderHoy();
+}
+function setStatusGoal(){ $("#heroMsg").textContent="¡Cumpliste tu meta de hoy, Berenice! 🎉 Tu racha sigue viva."; }
+function lessonDone(i){ return !!store.get("lessons",{})[i]; }
+function renderHoy(){
+  const t=DAY(); const a=store.get("act",{day:t,n:0}); const n=a.day===t?a.n:0;
+  const st=store.get("streak",{last:-1,n:0}); const streak = st.last>=t-1 ? st.n : 0;
+  $("#stStreak").textContent=streak; $("#stLetters").textContent=Object.keys(store.get("learned",{})).filter(k=>[...k].length===1).length;
+  const due=dueKeys().length; $("#stDue").textContent=due;
+  $("#goalTxt").textContent=`${Math.min(n,GOAL)} / ${GOAL} prácticas`; $("#goalBar").style.width=Math.min(100,n/GOAL*100)+"%";
+  $("#btnReview").textContent= due ? `Repasar (${due})` : "Repasar"; $("#btnReview").disabled=!due;
+  const next=LESSONS.findIndex((_,i)=>!lessonDone(i));
+  if(n<GOAL) $("#heroMsg").textContent = next<0 ? "¡Terminaste toda la ruta! Repasa y practica frases para no olvidar." : `Siguiente paso: lección ${next+1}, "${LESSONS[next].title}".`;
+  $("#btnContinue").hidden = next<0;
+  const best=store.get("bestExam",null); $("#bestTxt").textContent = best!=null ? `Mejor examen: ${best}/100` : "";
+  const box=$("#lessons"); box.innerHTML="";
+  LESSONS.forEach((L,i)=>{
+    const d=document.createElement("div"); d.className="lesson"+(lessonDone(i)?" done":"")+(i===next?" next":"");
+    d.innerHTML=`<div class="row" style="justify-content:space-between"><span class="lt"></span><span class="tag"></span></div><div class="lg"></div><div class="hint"></div>
+      <div class="row"><button class="btn" data-a="learn">1. Aprender</button><button class="btn" data-a="quiz">2. Examen</button></div>`;
+    d.querySelector(".lt").textContent=`${i+1}. ${L.title}`;
+    d.querySelector(".tag").textContent= lessonDone(i) ? "✓ Hecha" : i===next ? "Ahora" : "";
+    if(!d.querySelector(".tag").textContent) d.querySelector(".tag").hidden=true;
+    d.querySelector(".lg").textContent=L.kind==="word"?L.items.slice(0,3).join(" · ")+"…":L.items.join(" ");
+    d.querySelector(".hint").textContent=L.tip;
+    d.querySelector('[data-a="learn"]').onclick=()=>startLesson(i);
+    d.querySelector('[data-a="quiz"]').onclick=()=>startLessonQuiz(i);
+    box.appendChild(d);
+  });
+  const learned=store.get("learned",{});
+  [["#alphaV",VOWS],["#alphaC",CONS]].forEach(([sel,arr])=>{ const g=$(sel); if(g.childElementCount!==arr.length){ g.innerHTML="";
+      arr.forEach(r=>{ const b=document.createElement("button"); b.innerHTML=`<b></b><span></span>`; b.querySelector("b").textContent=r[0]; b.querySelector("span").textContent=r[3];
+        b.onclick=()=>{ const it=itemFor(r[0]); speak(it.say,"ko"); const tip=$("#alphaTip"); tip.innerHTML=""; const strong=document.createElement("b"); strong.className="kr"; strong.textContent=`${r[0]}  ${r[1]} `; tip.append(strong, document.createTextNode(`(${r[3]}). ${r[4]} `)); const pb=document.createElement("button"); pb.className="btn"; pb.style.minHeight="36px"; pb.style.padding="4px 10px"; pb.textContent="✍️ Escribirla"; pb.onclick=()=>{ loadItems([r[0]],0,"word"); showView("escribir"); }; tip.append(pb); };
+        g.appendChild(b); }); }
+    [...g.children].forEach((b,i)=>b.classList.toggle("learned",!!learned[arr[i][0]])); });
+}
+function startLesson(i){
+  const L=LESSONS[i];
+  if(L.kind==="word" && i===LESSONS.length-1){ curCat="Supervivencia"; store.set("cat",curCat); renderCats(); renderWords(); showView("palabras"); return; }
+  const chars = L.kind==="word" ? L.items.flatMap(w=>[...w].filter(isSyl)) : L.items;
+  loadItems(chars,0,"lesson:"+i); W.lesson=i; showView("escribir"); window.scrollTo({top:0,behavior:"smooth"});
+}
+$("#btnToQuiz").onclick=()=>{ const i=+W.label.slice(7); showView("hoy"); startLessonQuiz(i); };
+$("#btnExam").onclick=startGeneralExam;
+$("#btnContinue").onclick=()=>{ const next=LESSONS.findIndex((_,i)=>!lessonDone(i)); if(next>=0) startLesson(next); };
+// exámenes: por lección y general
+let LQ=null;
+function lessonOptions(kind,key){
+  if(kind==="word"){ const w=ALLWORDS.find(x=>x.ko===key); return {ans:w?w.es:romOf(key), pool:ALLWORDS.map(x=>x.es)}; }
+  const it=itemFor(key); const poolKeys = kind==="syl" ? SYLS.concat(LESSONS.filter(x=>x.kind==="syl").flatMap(x=>x.items)) : CONS.map(c=>c[0]).concat(VOWS.map(v=>v[0]));
+  return {ans:it.rom, pool:[...new Set(poolKeys.map(k=>itemFor(k).rom))]};
+}
+const kindOf = key => ALLWORDS.some(w=>w.ko===key) && [...key].length>1 ? "word" : (isSyl(key)?"syl":"jamo");
+function startLessonQuiz(i){
+  const L=LESSONS[i]; const qs=shuffle(L.items.slice()); while(qs.length<6) qs.push(L.items[Math.floor(Math.random()*L.items.length)]);
+  const types = L.kind==="word" ? ["meaning","meaning","write","meaning","meaning","write"] : ["sound","listen","write","sound","listen","sound"];
+  openExam({lesson:i, title:`Examen: ${L.title}`, qs:qs.slice(0,6).map((key,k)=>({key,type:types[k]}))});
+}
+function startGeneralExam(){
+  let pool=[...new Set(LESSONS.filter((_,i)=>lessonDone(i)).flatMap(L=>L.items).concat(Object.keys(store.get("learned",{}))))];
+  if(pool.length<6) pool=[...new Set(pool.concat(LESSONS[0].items,LESSONS[2].items))];
+  const letters=pool.filter(k=>kindOf(k)!=="word"); let words=pool.filter(k=>kindOf(k)==="word");
+  if(words.length<3) words=words.concat(VOCAB["Básicos"].map(w=>w[0]).filter(k=>!words.includes(k)));
+  const pick=a=>a[Math.floor(Math.random()*a.length)];
+  const plan=["sound","listen","meaning","write","sound","meaning","listen","write","meaning","sound"];
+  const qs=plan.map(type=>{ if(type==="meaning") return {type,key:pick(words)}; if(type==="write"){ const k=pick(letters.concat(words.filter(w=>[...w].filter(isSyl).length<=2))); return {type,key:k}; } return {type,key:pick(letters)}; });
+  openExam({lesson:null, title:"Examen de práctica", qs});
+}
+function openExam(cfg){
+  LQ={...cfg,k:0,right:0,answered:false};
+  $("#lqPanel").hidden=false; $("#reviewPanel").hidden=true; $("#lqTitle").textContent=cfg.title;
+  showLQ(); $("#lqPanel").scrollIntoView({behavior:"smooth",block:"start"});
+}
+function answerLQ(ok,fb){
+  LQ.answered=true; bump(); if(ok) LQ.right++;
+  $("#lqFb").textContent = ok ? "¡Correcto! 💗" : fb;
+  setTimeout(()=>{ LQ.k++; if(LQ.k<LQ.qs.length) showLQ(); else endLQ(); },1400);
+}
+function showLQ(){
+  const {key,type}=LQ.qs[LQ.k]; const kind=((type==="meaning"||type==="write") && ALLWORDS.some(w=>w.ko===key)) ? "word" : kindOf(key); const inf=infoFor(key); LQ.answered=false;
+  $("#lqProg").textContent=`${LQ.k+1} de ${LQ.qs.length} · ${LQ.right} bien`; $("#lqFb").textContent="";
+  const box=$("#lqOpts"); box.innerHTML=""; $("#lqQ").onclick=null; $("#lqQ").className="q";
+  let opts=null;
+  if(type==="write"){
+    const chars=[...key].filter(isSyl).length?[...key].filter(isSyl):[key];
+    $("#lqAsk").textContent = kind==="word" ? `Escribe en coreano, de memoria: "${inf.meaning.split(" · ")[0]}" (${inf.rom}).` : `Escribe de memoria la letra que suena "${inf.rom}".`;
+    $("#lqQ").textContent="✍️";
+    const b=document.createElement("button"); b.className="btn primary"; b.textContent="Escribir ahora"; b.style.gridColumn="1 / -1";
+    b.onclick=()=>{ W.exam={errs:0, prevMode:W.mode}; W.mode="memory"; loadItems(chars,0,"exam"); showView("escribir"); setStatus("Examen: escríbelo de memoria. Si fallas dos veces te doy una pista.");
+      $("#btnToQuiz").hidden=true; window.scrollTo({top:0,behavior:"smooth"}); };
+    const sk=document.createElement("button"); sk.textContent="No lo sé"; sk.style.gridColumn="1 / -1";
+    sk.onclick=()=>{ if(!LQ.answered) answerLQ(false,`Se escribe ${key}.`); };
+    box.append(b,sk); return;
+  }
+  if(type==="listen"){
+    $("#lqAsk").textContent="Escucha y toca lo que oíste."; $("#lqQ").textContent="🔊"; $("#lqQ").onclick=()=>speak(inf.say,"ko");
+    const src = kind==="syl" ? SYLS.concat(LESSONS.filter(x=>x.kind==="syl").flatMap(x=>x.items)) : VOWS.map(v=>v[0]).concat(CONS.map(c=>c[0]));
+    const others=shuffle([...new Set(src)].filter(x=>x!==key && itemFor(x).rom!==itemFor(key).rom)).slice(0,3);
+    opts=shuffle([key,...others]).map(x=>({label:x,ok:x===key,kr:true}));
+    setTimeout(()=>speak(inf.say,"ko"),250);
+  } else {
+    const o=lessonOptions(kind==="word"?"word":kind,key);
+    $("#lqAsk").textContent= type==="meaning" ? "¿Qué significa?" : "¿Cómo suena?"; $("#lqQ").textContent=key; $("#lqQ").className="q kr";
+    if(kind==="word") $("#lqQ").style.fontSize=[...key].length>5?"34px":""; else $("#lqQ").style.fontSize="";
+    const others=shuffle(o.pool.filter(x=>x!==o.ans)).slice(0,3);
+    opts=shuffle([o.ans,...others]).map(x=>({label:x,ok:x===o.ans}));
+  }
+  opts.forEach(op=>{ const b=document.createElement("button"); b.textContent=op.label; if(op.kr){ b.className="kr"; b.style.fontSize="26px"; }
+    b.onclick=()=>{ if(LQ.answered) return;
+      b.classList.add(op.ok?"right":"wrong"); [...box.children].forEach((c,j)=>{ if(opts[j].ok) c.classList.add("right"); });
+      if(type!=="listen") speak(inf.say,"ko");
+      answerLQ(op.ok, `Era ${key} = ${kind==="word"?inf.meaning.split(" · ")[0]:inf.rom}`); };
+    box.appendChild(b); });
+}
+function examWriteDone(){
+  const ok=W.exam.errs<=2; W.mode=W.exam.prevMode; W.exam=null;
+  showView("hoy"); $("#lqPanel").scrollIntoView({behavior:"smooth",block:"start"});
+  answerLQ(ok, "Lo escribiste, pero con varios errores de trazo. ¡Sigue practicando!");
+}
+function endLQ(){
+  const n=LQ.qs.length, pct=Math.round(LQ.right/n*100);
+  $("#lqOpts").innerHTML=""; $("#lqQ").onclick=null; $("#lqQ").className="q"; $("#lqQ").style.fontSize="";
+  $("#lqProg").textContent=`${LQ.right} de ${n}`;
+  if(LQ.lesson!=null){
+    const L=LESSONS[LQ.lesson], pass=LQ.right>=n-1;
+    $("#lqQ").textContent= pass ? "🎉" : "💪";
+    $("#lqAsk").textContent= pass ? `¡Aprobaste "${L.title}" con ${LQ.right} de ${n}! Esto ya está en tu repaso.` : `Sacaste ${LQ.right} de ${n}. Repasa un poco y vuelve a intentarlo; necesitas ${n-1}.`;
+    if(pass){ const ls=store.get("lessons",{}); ls[LQ.lesson]=true; store.set("lessons",ls); L.items.forEach(addToDeck); }
+  } else {
+    const best=store.get("bestExam",0); const nb=Math.max(best,pct); store.set("bestExam",nb);
+    $("#lqQ").textContent = pct>=80?"🏆":pct>=50?"⭐":"💪";
+    $("#lqAsk").textContent = `Calificación: ${pct} / 100 (${LQ.right} de ${n}). ${pct>best?"¡Nuevo récord, Berenice!":`Tu mejor nota: ${nb}.`} ${pct>=80?"¡Excelente!":pct>=50?"¡Vas muy bien!":"Repasa tus lecciones y vuelve a intentarlo."}`;
+  }
+  const again=document.createElement("button"); again.className="btn"; again.textContent="Intentar otra vez"; again.style.gridColumn="1 / -1";
+  const was=LQ.lesson; again.onclick=()=> was!=null ? startLessonQuiz(was) : startGeneralExam();
+  $("#lqOpts").appendChild(again);
+  renderHoy();
+}
+$("#lqClose").onclick=()=>{ $("#lqPanel").hidden=true; if(W.exam){ W.mode=W.exam.prevMode; W.exam=null; } };
+// repaso espaciado (sistema de cajas)
+let REV=null;
+$("#btnReview").onclick=()=>{ const keys=shuffle(dueKeys()); if(!keys.length) return; REV={keys,k:0}; $("#reviewPanel").hidden=false; $("#lqPanel").hidden=true; showRV(); $("#reviewPanel").scrollIntoView({behavior:"smooth",block:"start"}); };
+function showRV(){
+  if(REV.k>=REV.keys.length){ $("#revFront").textContent="✨"; $("#revBack").hidden=false; $("#revRom").textContent="¡Repaso terminado!"; $("#revMeaning").textContent="Vuelve mañana para el siguiente."; $("#revShowRow").hidden=true; $("#revRateRow").hidden=true; $("#revLeft").textContent=""; renderHoy(); return; }
+  const inf=infoFor(REV.keys[REV.k]); $("#revFront").textContent=inf.front; $("#revRom").textContent=inf.rom; $("#revMeaning").textContent=inf.meaning;
+  $("#revBack").hidden=true; $("#revShowRow").hidden=false; $("#revRateRow").hidden=true; $("#revLeft").textContent=`Quedan ${REV.keys.length-REV.k}`;
+}
+$("#revShow").onclick=()=>{ $("#revBack").hidden=false; $("#revShowRow").hidden=true; $("#revRateRow").hidden=false; speak(infoFor(REV.keys[REV.k]).say,"ko"); };
+$("#revSound").onclick=()=>{ if(REV) speak(infoFor(REV.keys[REV.k]).say,"ko"); };
+function rate(knew){
+  const key=REV.keys[REV.k], d=store.get("deck",{}), c=d[key]||{box:0};
+  if(knew){ c.box=Math.min(c.box+1,INTERVALS.length-1); c.due=DAY()+INTERVALS[c.box]; }
+  else { c.box=0; c.due=DAY(); REV.keys.push(key); }
+  d[key]=c; store.set("deck",d); REV.k++; bump(); showRV();
+}
+$("#revYes").onclick=()=>rate(true); $("#revNo").onclick=()=>rate(false);
+
+/* ---------- Inicio ---------- */
+new ResizeObserver(()=>{ if(!$("#view-escribir").hidden) resize(); }).observe($(".canvas-box"));
+matchMedia("(prefers-color-scheme: dark)").addEventListener?.("change",draw);
+new MutationObserver(draw).observe(document.documentElement,{attributes:true,attributeFilter:["data-theme"]});
+document.querySelectorAll("[data-mode]").forEach(x=>x.setAttribute("aria-pressed",String(x.dataset.mode===W.mode)));
+document.querySelectorAll("[data-set]").forEach(x=>x.setAttribute("aria-pressed",String(x.dataset.set===curSet)));
+const startList = curSet==="cons"?CONS.map(c=>c[0]) : curSet==="vow"?VOWS.map(v=>v[0]) : SYLS;
+loadItems(startList, store.get("pos:"+curSet,0), curSet);
+renderCats(); renderWords(); newQuiz(); renderSay();
+const startView=(location.hash||"").slice(1);
+const VIEWS=["hoy","escribir","palabras","hablar","traducir"];
+renderHoy();
+showView(VIEWS.includes(startView)?startView:store.get("view","hoy"));
+window.addEventListener("hashchange",()=>{ const v=location.hash.slice(1); if(VIEWS.includes(v)) showView(v); });
+if("speechSynthesis" in window) speechSynthesis.getVoices();
+
+function webDictation(){
+  const SR=window.SpeechRecognition||window.webkitSpeechRecognition; if(!SR) return null;
+  let rec=null, P=()=>{}, F=()=>{}, S=()=>{};
+  return {
+    onPartial(f){P=f}, onFinal(f){F=f}, onState(f){S=f},
+    start({language}){ return new Promise((res,rej)=>{
+      rec=new SR(); rec.lang= language==="ko"?"ko-KR":"en-US"; rec.interimResults=true; rec.continuous=false;
+      rec.onstart=()=>{ S({state:"listening"}); res(); };
+      rec.onresult=e=>{ let interim=""; for(let i=e.resultIndex;i<e.results.length;i++){ const r=e.results[i]; if(r.isFinal) F({text:r[0].transcript}); else interim+=r[0].transcript; } P({text:interim}); };
+      rec.onerror=e=>{ if(e.error==="not-allowed"||e.error==="service-not-allowed"){ $("#sayMic").hidden=true; $("#micNote").textContent="El micrófono no está permitido. Actívalo en los ajustes del navegador, o sigue practicando escuchando y repitiendo."; const err=new Error("mic"); err.code="not_granted"; rej(err); } };
+      rec.onend=()=>{ S({state:"idle"}); rec=null; };
+      S({state:"starting"}); try{ rec.start(); }catch(err){ rej(err); }
+    }); },
+    stop(){ try{ rec&&rec.stop(); }catch(e){} return Promise.resolve(); }
+  };
+}
+function setupDict(d){
+  if(!d){ $("#micNote").textContent="El micrófono para calificar tu pronunciación no funciona en este navegador. Puedes escuchar y repetir."; return; }
+  dict=d; $("#sayMic").hidden=false; $("#micNote").textContent="";
+  d.onPartial(({text})=>{ $("#sayHeard").textContent=(heard+" "+text).trim(); });
+  d.onFinal(({text})=>{ heard=(heard+" "+text).trim(); });
+  d.onState(({state})=>{ listening = state==="listening"||state==="starting"; $("#sayMic").textContent= listening?"⏹ Terminar":"🎙️ Ahora tú"; if(listening) wasListening=true; if(state==="idle" && wasListening){ wasListening=false; gradeSpeech(); } });
+  renderSay();
+}
+if(window.claude && claude.use){
+  claude.use("tts").then(t=>{ tts=t; });
+  claude.use("sample").then(s=>{ sample=s; });
+  claude.use("dictation").then(d=>setupDict(d||webDictation()));
+} else setupDict(webDictation());
+})();
+</script>
+<script>
+if("serviceWorker" in navigator) window.addEventListener("load",()=>navigator.serviceWorker.register("sw.js").catch(()=>{}));
+</script>
+</body>
+</html>
