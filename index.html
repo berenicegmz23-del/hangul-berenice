@@ -43,7 +43,7 @@ header.top h1 span{color:var(--accent)}
 @media (max-width:520px){header.top h1{font-size:23px}}
 header.top p{margin:0;color:var(--muted);font-size:14px}
 nav.tabs{position:fixed;left:0;right:0;bottom:0;z-index:20;background:var(--sheet);border-top:1px solid var(--line);
-  display:grid;grid-template-columns:repeat(5,1fr);
+  display:grid;grid-template-columns:repeat(6,1fr);
   padding:6px max(8px,env(safe-area-inset-right,0px)) calc(6px + env(safe-area-inset-bottom,0px)) max(8px,env(safe-area-inset-left,0px))}
 nav.tabs button{background:none;border:0;border-radius:12px;padding:6px 4px;display:flex;flex-direction:column;align-items:center;gap:2px;font-size:12.5px;color:var(--muted)}
 nav.tabs button b{font-family:var(--kr);font-size:20px;line-height:1.1;font-weight:700}
@@ -105,6 +105,68 @@ textarea{min-height:110px;resize:vertical}
 .links a{color:var(--accent);font-weight:600}
 
 /* Palabras */
+#wrEn{min-width:0}
+#enCats{flex-wrap:wrap;overflow:visible}
+@media (max-width:860px){nav.tabs button{font-size:11.5px;padding:6px 2px} nav.tabs button b{font-size:18px}}
+.cl-cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:10px;margin-top:12px}
+.cl-card{display:flex;align-items:center;gap:12px;text-align:left;border:1px solid var(--line);border-radius:16px;background:var(--sheet);padding:12px 14px;min-height:64px}
+.cl-card.now{border:2px solid var(--accent);background:linear-gradient(135deg,var(--sheet),var(--accent-soft))}
+.cl-emoji{font-size:30px;line-height:1}
+.cl-t{display:grid;flex:1;min-width:0}
+.cl-t b{font-size:13px;color:var(--muted);font-weight:600}
+.cl-t span{font-family:var(--display);font-weight:600;font-size:18px}
+.cl-stars{color:var(--gold);font-size:18px;letter-spacing:1px;white-space:nowrap}
+.cl-steps{display:flex;gap:6px;flex-wrap:wrap;font-size:13px}
+.cl-steps span{padding:4px 10px;border-radius:999px;border:1px solid var(--line);color:var(--muted)}
+.cl-steps .on{background:var(--accent);border-color:var(--accent);color:var(--sheet)}
+.cl-steps .done{background:var(--accent-soft);color:var(--accent)}
+#clBody{display:grid;gap:14px}
+.teacher{display:flex;gap:12px;align-items:flex-start}
+.t-av{font-size:40px;line-height:1;flex:none;background:var(--accent-soft);border-radius:50%;width:58px;height:58px;display:grid;place-items:center}
+.t-bubble{background:var(--paper);border:1px solid var(--line);border-radius:4px 18px 18px 18px;padding:12px 16px;min-width:0;font-size:16.5px}
+.t-bubble p{margin:0 0 8px}.t-bubble p:last-child{margin:0}
+.t-bubble b{color:var(--accent)}
+.pattern{border:2px dashed var(--grid);border-radius:16px;padding:12px 16px;text-align:center;display:grid;gap:4px;background:var(--sheet)}
+.pattern div{font-size:22px;font-weight:600}
+.pattern b{color:var(--accent)}.pattern i{font-style:normal;color:var(--gold)}
+.ex-list{display:grid;gap:8px}
+.ex-sent{display:flex;gap:10px;align-items:center;justify-content:space-between;border:1px solid var(--line);border-radius:14px;padding:10px 12px;background:var(--sheet)}
+.s-text{min-width:0;display:grid;gap:2px}
+.s-main{font-size:22px;font-weight:700}
+.s-main.kr{font-family:var(--kr)}
+.s-rom{color:var(--accent);font-size:14px;font-weight:600}
+.s-es{color:var(--muted);font-size:15px}
+.s-btns{display:flex;gap:6px;flex:none}.s-btns .btn{padding:6px 10px;min-height:40px}
+.ex-ask{font-weight:700;margin:0;font-size:17px}
+.ex-q{display:grid;gap:6px;justify-items:center;text-align:center}
+.ex-q .s-main{font-size:28px}
+.s-es-big{font-family:var(--display);font-size:24px;font-weight:600;text-align:center}
+.blank{display:inline-block;min-width:60px;border-bottom:3px solid var(--accent);color:var(--accent)}
+.tiles-wrap{display:grid;gap:12px}
+.tiles-ans{min-height:64px;border:2px dashed var(--grid);border-radius:14px;padding:8px;display:flex;flex-wrap:wrap;gap:6px;align-items:center;background:var(--paper)}
+.tiles-ans.ok{border-style:solid;border-color:var(--accent);background:var(--accent-soft)}
+.tiles-ans.no{border-style:solid;border-color:var(--warn)}
+.tiles-pool{display:flex;flex-wrap:wrap;gap:8px;justify-content:center}
+.tile{border:1px solid var(--grid);background:var(--sheet);border-radius:12px;padding:8px 14px;min-height:48px;font-size:19px;font-weight:600;display:grid;justify-items:center;box-shadow:0 2px 0 var(--line)}
+.tile small{font-size:11.5px;color:var(--muted);font-family:var(--body);font-weight:500}
+.tile.used{opacity:.3}
+.cl-big-stars{font-size:46px;color:var(--gold);text-align:center;letter-spacing:6px}
+.status u{text-decoration-color:var(--warn);text-decoration-thickness:3px}
+.lang-switch{display:flex;justify-content:center;margin-bottom:14px}
+.lang-switch .seg button{font-size:16px;padding:10px 18px}
+.en-board{display:grid;gap:12px;justify-items:center;max-width:820px;margin-inline:auto}
+.en-card{text-align:center;display:grid;gap:2px}
+.en-card .es{font-family:var(--display);font-size:34px;font-weight:600;line-height:1.2}
+.en-card .ko{font-family:var(--kr);color:var(--muted);font-size:17px}
+.en-pad-box{width:100%;position:relative}
+#enPad{width:100%;display:block;touch-action:none;background:#fff;border:1px solid var(--line);border-radius:16px;cursor:crosshair}
+.en-check{display:flex;gap:8px;width:100%;max-width:560px}
+.en-check input{font-size:22px;text-align:center}
+.en-letters{display:flex;flex-wrap:wrap;justify-content:center;gap:3px;font-size:26px;font-weight:700;min-height:0}
+.en-letters span{min-width:20px;padding:2px 5px;border-radius:7px;text-align:center}
+.en-letters .ok{background:var(--accent-soft);color:var(--accent)}
+.en-letters .no{background:color-mix(in srgb,var(--warn) 18%,transparent);color:var(--warn)}
+.en-letters .miss{border:2px dashed var(--warn);color:var(--warn)}
 .cats{display:flex;gap:6px;overflow-x:auto;padding-bottom:4px}
 .cats button{white-space:nowrap}
 .words{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:10px}
@@ -177,6 +239,7 @@ body{padding-top:env(safe-area-inset-top,0px)}
 
   <nav class="tabs" role="tablist" aria-label="Secciones">
     <button role="tab" id="tab-hoy" aria-selected="true" data-view="hoy"><b>오늘</b>Hoy</button>
+    <button role="tab" id="tab-clase" aria-selected="false" data-view="clase"><b>수업</b>Clase</button>
     <button role="tab" id="tab-escribir" aria-selected="false" data-view="escribir"><b>쓰기</b>Escribir</button>
     <button role="tab" id="tab-palabras" aria-selected="false" data-view="palabras"><b>단어</b>Palabras</button>
     <button role="tab" id="tab-hablar" aria-selected="false" data-view="hablar"><b>말하기</b>Hablar</button>
@@ -199,6 +262,7 @@ body{padding-top:env(safe-area-inset-top,0px)}
       </div>
       <div class="row">
         <button class="btn primary" id="btnContinue">Continuar lección</button>
+        <button class="btn primary" id="btnClass">👩‍🏫 Clase de hoy</button>
         <button class="btn" id="btnReview">Repasar</button>
         <button class="btn" id="btnExam">📝 Examen de práctica</button>
       </div>
@@ -247,9 +311,77 @@ body{padding-top:env(safe-area-inset-top,0px)}
     </div>
   </section>
 
+  <!-- CLASE -->
+  <section class="view" id="view-clase" hidden>
+    <div class="panel" id="clList">
+      <div class="row" style="justify-content:space-between">
+        <h2>👩‍🏫 Tus clases</h2>
+        <div class="seg" role="group" aria-label="Idioma de la clase">
+          <button aria-pressed="true" data-cltrack="ko">한국어 Coreano</button>
+          <button aria-pressed="false" data-cltrack="en">English Inglés</button>
+        </div>
+      </div>
+      <p class="hint" id="clIntro"></p>
+      <div class="cl-cards" id="clCards"></div>
+    </div>
+    <div class="panel" id="clRoom" hidden>
+      <div style="display:grid;gap:10px;margin-bottom:14px">
+        <div class="row" style="justify-content:space-between"><button class="btn ghost" id="clBack">← Clases</button><div class="cl-steps" id="clSteps"></div></div>
+        <h2 id="clTitle"></h2>
+      </div>
+      <div id="clBody"></div>
+    </div>
+  </section>
+
   <!-- ESCRIBIR -->
   <section class="view" id="view-escribir" hidden>
-    <div class="write-grid">
+    <div class="lang-switch"><div class="seg" role="group" aria-label="Idioma para escribir">
+      <button id="wl-ko" aria-pressed="true" data-wl="ko">한글 Coreano</button>
+      <button id="wl-en" aria-pressed="false" data-wl="en">ABC Inglés</button>
+    </div></div>
+    <div id="wrEn" hidden>
+      <div class="panel en-board">
+        <div class="row" style="justify-content:space-between;width:100%">
+          <div class="seg" role="group" aria-label="Modo de práctica en inglés">
+            <button aria-pressed="true" data-enmode="guide">Con guía</button>
+            <button aria-pressed="false" data-enmode="memory">De memoria</button>
+          </div>
+          <span class="progress" id="enProg"></span>
+        </div>
+        <div class="en-card">
+          <div class="es" id="enEs">Hola</div>
+          <div class="ko" id="enKo"></div>
+        </div>
+        <div class="row" style="justify-content:center">
+          <button class="btn" id="enListen">🔊 Escuchar en inglés</button>
+          <button class="btn" id="enSlow">🐢 Lento</button>
+          <button class="btn" id="enSpell">🔤 Deletrear</button>
+        </div>
+        <div class="en-pad-box"><canvas id="enPad" aria-label="Renglones para escribir en inglés con el lápiz o el dedo"></canvas></div>
+        <div class="row" style="justify-content:center">
+          <button class="btn" id="enUndo">↶ Deshacer</button>
+          <button class="btn" id="enClear">Borrar</button>
+          <button class="btn" id="enShow">👀 Ver la palabra</button>
+        </div>
+        <p class="hint" style="text-align:center;margin:0" id="enHow">Copia las letras sobre la guía. Luego escríbela en la cajita para revisarla (en iPad puedes escribir ahí con el Apple Pencil).</p>
+        <div class="en-check">
+          <input type="text" id="enInput" placeholder="Escríbela aquí en inglés" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false">
+          <button class="btn primary" id="enCheck">Revisar</button>
+        </div>
+        <div class="en-letters" id="enLetters" aria-live="polite"></div>
+        <div class="status" id="enStatus" role="status">Escucha la palabra, cópiala y luego escríbela tú sola.</div>
+        <div class="row" style="justify-content:center">
+          <button class="btn ghost" id="enPrev">← Anterior</button>
+          <button class="btn primary" id="enNext">Siguiente →</button>
+        </div>
+      </div>
+      <div class="panel" style="margin-top:16px">
+        <h3>¿Qué palabras practico?</h3>
+        <div class="cats" id="enCats" style="margin-top:8px"></div>
+        <p class="hint" style="margin-top:10px">Consejo: en inglés muchas letras no suenan como se escriben. Escucha, deletrea letra por letra y escríbela 3 veces. Las palabras que aciertas pasan a tu repaso.</p>
+      </div>
+    </div>
+    <div class="write-grid" id="wrKo">
       <div class="panel board">
         <div class="row" style="justify-content:space-between;width:100%;max-width:520px">
           <div class="seg" role="group" aria-label="Modo de práctica">
@@ -314,7 +446,7 @@ body{padding-top:env(safe-area-inset-top,0px)}
   <section class="view" id="view-palabras" hidden>
     <div class="panel">
       <h2>Palabras y frases</h2>
-      <p class="hint" style="margin-bottom:10px">Coreano, español e inglés. Toca 🔊 para escuchar o ✍️ para practicar su escritura.</p>
+      <p class="hint" style="margin-bottom:10px">Coreano, español e inglés. Toca 🔊 para escuchar o ✍️ para practicar cómo se escribe en coreano o en inglés.</p>
       <div class="cats" id="cats"></div>
     </div>
     <div class="words" id="words"></div>
@@ -548,6 +680,34 @@ const VOCAB = {
  "Números":[
   ["하나","Uno (nativo)","One"],["둘","Dos (nativo)","Two"],["셋","Tres (nativo)","Three"],["일","Uno (para fechas y dinero)","One"],
   ["이","Dos (para fechas y dinero)","Two"],["삼","Tres (para fechas y dinero)","Three"],["십","Diez","Ten"],["백","Cien","One hundred"]],
+ "Colores":[
+  ["빨간색","Rojo","Red"],["파란색","Azul","Blue"],["노란색","Amarillo","Yellow"],["초록색","Verde","Green"],["분홍색","Rosa","Pink"],
+  ["검은색","Negro","Black"],["흰색","Blanco","White"],["보라색","Morado","Purple"],["주황색","Naranja","Orange"],["갈색","Café / marrón","Brown"]],
+ "Familia":[
+  ["엄마","Mamá","Mom"],["아빠","Papá","Dad"],["언니","Hermana mayor (de una mujer)","Older sister"],["오빠","Hermano mayor (de una mujer)","Older brother"],
+  ["동생","Hermano o hermana menor","Younger sibling"],["할머니","Abuela","Grandmother"],["할아버지","Abuelo","Grandfather"],["아들","Hijo","Son"],["딸","Hija","Daughter"],["아기","Bebé","Baby"]],
+ "Animales":[
+  ["개","Perro","Dog"],["고양이","Gato","Cat"],["새","Pájaro","Bird"],["물고기","Pez","Fish"],["말","Caballo","Horse"],
+  ["소","Vaca","Cow"],["토끼","Conejo","Rabbit"],["곰","Oso","Bear"],["돼지","Cerdo","Pig"],["호랑이","Tigre","Tiger"]],
+ "Cuerpo":[
+  ["머리","Cabeza","Head"],["눈","Ojo","Eye"],["코","Nariz","Nose"],["입","Boca","Mouth"],["귀","Oreja","Ear"],
+  ["손","Mano","Hand"],["발","Pie","Foot"],["다리","Pierna","Leg"],["팔","Brazo","Arm"],["얼굴","Cara","Face"]],
+ "Casa y escuela":[
+  ["문","Puerta","Door"],["창문","Ventana","Window"],["침대","Cama","Bed"],["의자","Silla","Chair"],["책상","Escritorio","Desk"],
+  ["연필","Lápiz","Pencil"],["펜","Pluma","Pen"],["가방","Bolsa / mochila","Bag"],["휴대폰","Celular","Phone"],["선생님","Maestra / maestro","Teacher"]],
+ "Verbos":[
+  ["먹어요","Comer","Eat"],["마셔요","Beber","Drink"],["가요","Ir","Go"],["와요","Venir","Come"],["자요","Dormir","Sleep"],
+  ["읽어요","Leer","Read"],["써요","Escribir","Write"],["말해요","Hablar","Speak"],["들어요","Escuchar","Listen"],["공부해요","Estudiar","Study"],
+  ["좋아해요","Gustar","Like"],["일해요","Trabajar","Work"]],
+ "Días y tiempo":[
+  ["월요일","Lunes","Monday"],["화요일","Martes","Tuesday"],["수요일","Miércoles","Wednesday"],["목요일","Jueves","Thursday"],["금요일","Viernes","Friday"],
+  ["토요일","Sábado","Saturday"],["일요일","Domingo","Sunday"],["오늘","Hoy","Today"],["내일","Mañana","Tomorrow"],["어제","Ayer","Yesterday"]],
+ "Ropa":[
+  ["옷","Ropa","Clothes"],["셔츠","Camisa","Shirt"],["바지","Pantalón","Pants"],["치마","Falda","Skirt"],["신발","Zapatos","Shoes"],
+  ["모자","Gorra / sombrero","Hat"],["드레스","Vestido","Dress"],["양말","Calcetines","Socks"]],
+ "Más números":[
+  ["넷","Cuatro (nativo)","Four"],["다섯","Cinco (nativo)","Five"],["여섯","Seis (nativo)","Six"],["일곱","Siete (nativo)","Seven"],
+  ["여덟","Ocho (nativo)","Eight"],["아홉","Nueve (nativo)","Nine"],["열","Diez (nativo)","Ten"],["스물","Veinte (nativo)","Twenty"]],
  "Sentimientos":[
   ["행복해요","Estoy feliz","I'm happy"],["피곤해요","Estoy cansada / cansado","I'm tired"],["사랑해요","Te quiero / Te amo","I love you"],
   ["보고 싶어요","Te extraño","I miss you"],["화이팅!","¡Ánimo! ¡Tú puedes!","You can do it!"],["재미있어요","Es divertido","It's fun"]]
@@ -783,17 +943,557 @@ $("#btnNext").onclick=()=>{ if(W.idx<W.items.length-1){ W.idx++; if(W.label!=="w
 function practiceWord(text){
   const chars=[...text].filter(isSyl);
   if(!chars.length){ setStatus("Escribe al menos una sílaba en coreano (por ejemplo 사랑).","bad"); return; }
-  loadItems(chars,0,"word"); showView("escribir"); window.scrollTo({top:0,behavior:"smooth"});
+  setWriteLang("ko"); loadItems(chars,0,"word"); showView("escribir"); window.scrollTo({top:0,behavior:"smooth"});
 }
 $("#btnCustom").onclick=()=>practiceWord($("#customWord").value);
 $("#customWord").addEventListener("keydown",e=>{ if(e.key==="Enter") practiceWord(e.target.value); });
+
+/* ---------- Escribir en inglés ---------- */
+function setWriteLang(l){
+  document.querySelectorAll("[data-wl]").forEach(b=>b.setAttribute("aria-pressed",String(b.dataset.wl===l)));
+  $("#wrKo").hidden = l!=="ko"; $("#wrEn").hidden = l!=="en"; store.set("wl",l);
+  if(l==="ko") requestAnimationFrame(resize); else requestAnimationFrame(()=>{ enResize(); });
+}
+document.querySelectorAll("[data-wl]").forEach(b=>b.onclick=()=>setWriteLang(b.dataset.wl));
+const EN = { cat:store.get("enCat","Básicos"), list:[], idx:0, mode:store.get("enMode","guide"), strokes:[], active:null, reveal:false, pen:false, lines:[""] };
+const enPad=$("#enPad"), ectx=enPad.getContext("2d");
+const enAnswers = w => w.en.split("/").map(x=>x.trim());
+function enBuildList(){
+  const base = EN.cat==="Todas" ? ALLWORDS : ALLWORDS.filter(w=>w.cat===EN.cat);
+  EN.list = base.filter(w=>enAnswers(w)[0].length<=26);
+  if(!EN.list.length) EN.list=ALLWORDS.slice(0,10);
+}
+function renderEnCats(){
+  const c=$("#enCats"); c.innerHTML="";
+  ["Todas",...Object.keys(VOCAB)].forEach(k=>{ const b=document.createElement("button"); b.className="btn"; b.textContent=k; b.setAttribute("aria-pressed",String(k===EN.cat));
+    b.onclick=()=>{ EN.cat=k; store.set("enCat",k); EN.idx=0; renderEnCats(); enBuildList(); enLoad(); }; c.appendChild(b); });
+}
+const enCur = () => EN.list[EN.idx % EN.list.length];
+const enTarget = () => enAnswers(enCur())[0];
+function enStatus(msg,kind){ const s=$("#enStatus"); s.textContent=msg; s.className="status"+(kind?" "+kind:""); }
+function enLoad(){
+  const w=enCur(); if(!w) return;
+  $("#enEs").textContent=w.es; $("#enKo").textContent=w.ko+" · "+romOf(w.ko);
+  $("#enProg").textContent=`${EN.idx%EN.list.length+1} de ${EN.list.length}`;
+  $("#enInput").value=""; $("#enLetters").innerHTML=""; EN.strokes=[]; EN.reveal=false;
+  $("#enShow").hidden = EN.mode!=="memory";
+  enStatus(EN.mode==="memory" ? "¿Cómo se escribe en inglés? Escríbela de memoria. Si no la recuerdas, escúchala o toca 👀." : "Escucha la palabra y cópiala sobre la guía rosa. Luego escríbela en la cajita.");
+  enResize();
+}
+function enWrap(text, font, maxW){
+  ectx.font=font; const words=text.split(" "); const lines=[]; let cur="";
+  words.forEach(wd=>{ const t=cur?cur+" "+wd:wd; if(ectx.measureText(t).width<=maxW || !cur) cur=t; else { lines.push(cur); cur=wd; } });
+  if(cur) lines.push(cur); return lines;
+}
+let enRow=150, enFont=96;
+function enResize(){
+  if($("#wrEn").hidden || $("#view-escribir").hidden) return;
+  const w=enPad.parentElement.clientWidth; if(!w) return;
+  const dpr=window.devicePixelRatio||1;
+  enFont = Math.max(54, Math.min(110, w/7)); enRow = Math.round(enFont*1.55);
+  const fontStr = `600 ${enFont}px "Nunito", system-ui, sans-serif`;
+  EN.lines = enWrap(enTarget(), fontStr, w-48);
+  const h = enRow*Math.max(1,EN.lines.length) + 24;
+  enPad.style.height=h+"px"; enPad.width=Math.round(w*dpr); enPad.height=Math.round(h*dpr);
+  ectx.setTransform(dpr,0,0,dpr,0,0); enDraw();
+}
+function enDraw(){
+  const w=enPad.width/(window.devicePixelRatio||1), h=enPad.height/(window.devicePixelRatio||1);
+  ectx.clearRect(0,0,w,h);
+  const fontStr = `600 ${enFont}px "Nunito", system-ui, sans-serif`;
+  EN.lines.forEach((line,i)=>{
+    const top=12+i*enRow, base=top+enRow*0.72, xh=base-enFont*0.50, cap=base-enFont*0.72, desc=base+enFont*0.22;
+    ectx.lineWidth=1.5;
+    ectx.strokeStyle="#F09DB4"; ectx.setLineDash([]); [cap,base].forEach(y=>{ ectx.beginPath(); ectx.moveTo(14,y); ectx.lineTo(w-14,y); ectx.stroke(); });
+    ectx.strokeStyle="#F5CAD6"; ectx.setLineDash([8,8]); [xh,desc].forEach(y=>{ ectx.beginPath(); ectx.moveTo(14,y); ectx.lineTo(w-14,y); ectx.stroke(); });
+    ectx.setLineDash([]);
+    if(EN.mode==="guide" || EN.reveal){
+      ectx.font=fontStr; ectx.textBaseline="alphabetic"; ectx.fillStyle = EN.reveal&&EN.mode==="memory" ? "rgba(176,18,63,.28)" : "#F7CCD8";
+      ectx.fillText(line, 24, base);
+    }
+  });
+  ectx.lineCap="round"; ectx.lineJoin="round"; ectx.strokeStyle="#6B0F24";
+  const all = EN.active ? [...EN.strokes, EN.active.pts] : EN.strokes;
+  all.forEach(pts=>{ for(let i=1;i<pts.length;i++){ const a=pts[i-1], b=pts[i];
+    ectx.lineWidth = Math.max(2.5, Math.min(9, enFont*0.075*(b.p||0.6)*1.6));
+    ectx.beginPath(); ectx.moveTo(a.x*w,a.y*h); ectx.lineTo(b.x*w,b.y*h); ectx.stroke(); }
+    if(pts.length===1){ ectx.beginPath(); ectx.arc(pts[0].x*w,pts[0].y*h,3,0,7); ectx.fillStyle="#6B0F24"; ectx.fill(); } });
+}
+function enPt(e){ const r=enPad.getBoundingClientRect(); return {x:(e.clientX-r.left)/r.width, y:(e.clientY-r.top)/r.height, p:e.pointerType==="pen"?(e.pressure||0.5):0.6}; }
+enPad.addEventListener("pointerdown",e=>{
+  if(e.pointerType==="pen") EN.pen=true;
+  if(EN.pen && e.pointerType==="touch") return; // rechazo de palma
+  if(EN.active) return;
+  e.preventDefault(); enPad.setPointerCapture(e.pointerId); EN.active={id:e.pointerId,pts:[enPt(e)]}; enDraw();
+});
+enPad.addEventListener("pointermove",e=>{ if(!EN.active||e.pointerId!==EN.active.id) return; e.preventDefault();
+  (e.getCoalescedEvents?e.getCoalescedEvents():[e]).forEach(ev=>EN.active.pts.push(enPt(ev))); enDraw(); });
+function enEnd(e){ if(!EN.active||e.pointerId!==EN.active.id) return; EN.strokes.push(EN.active.pts); EN.active=null; enDraw(); }
+enPad.addEventListener("pointerup",enEnd); enPad.addEventListener("pointercancel",enEnd);
+enPad.addEventListener("touchstart",e=>e.preventDefault(),{passive:false});
+enPad.addEventListener("touchmove",e=>e.preventDefault(),{passive:false});
+let enLastW=0; new ResizeObserver(es=>{ const w=Math.round(es[0].contentRect.width); if(w!==enLastW){ enLastW=w; enResize(); } }).observe($(".en-pad-box"));
+$("#enUndo").onclick=()=>{ EN.strokes.pop(); enDraw(); };
+$("#enClear").onclick=()=>{ EN.strokes=[]; enDraw(); };
+$("#enShow").onclick=()=>{ EN.reveal=!EN.reveal; enDraw(); };
+$("#enListen").onclick=()=>speak(enTarget(),"en");
+$("#enSlow").onclick=()=>speak(enTarget(),"en",true);
+$("#enSpell").onclick=async()=>{
+  const t=enTarget(); const letters=[...t].filter(c=>/[a-z]/i.test(c));
+  $("#enLetters").innerHTML=""; [...t].forEach(c=>{ const sp=document.createElement("span"); sp.textContent=c===" "?" ":c; $("#enLetters").appendChild(sp); });
+  speak(letters.map(c=>c.toUpperCase()).join(", "),"en",true);
+};
+document.querySelectorAll("[data-enmode]").forEach(b=>b.onclick=()=>{ EN.mode=b.dataset.enmode; store.set("enMode",EN.mode);
+  document.querySelectorAll("[data-enmode]").forEach(x=>x.setAttribute("aria-pressed",String(x===b))); enLoad(); });
+const enNorm=s=>s.toLowerCase().replace(/[’`]/g,"'").replace(/[^a-z0-9' ]/g,"").replace(/\s+/g," ").trim();
+function enCheck(){
+  const raw=$("#enInput").value; const v=enNorm(raw); if(!v){ enStatus("Primero escribe la palabra en la cajita.","bad"); return; }
+  const w=enCur(); const answers=enAnswers(w);
+  const ok = answers.some(a=>{ const n=enNorm(a); return n===v || n.replace(/^(the|a|an) /,"")===v; });
+  const target=enNorm(answers[0]);
+  // letra por letra
+  const box=$("#enLetters"); box.innerHTML="";
+  const n=Math.max(target.length, v.length);
+  for(let i=0;i<n;i++){ const sp=document.createElement("span"); const t=target[i], u=v[i];
+    if(t===undefined){ sp.textContent=u; sp.className="no"; }
+    else if(u===undefined){ sp.textContent=t===" "?" ":t; sp.className="miss"; }
+    else { sp.textContent=t===" "?" ":t; sp.className= t===u?"ok":"no"; }
+    box.appendChild(sp); }
+  bump();
+  if(ok){
+    box.querySelectorAll("span").forEach(x=>x.className="ok");
+    const learned=store.get("enLearned",{}); learned[answers[0]]=true; store.set("enLearned",learned);
+    addToDeck(w.ko);
+    enStatus(`¡Perfecto, Berenice! "${answers[0]}" = ${w.es}. ⭐`,"done"); speak(answers[0],"en");
+    if(EN.mode==="guide") setTimeout(()=>{ if(enCur()===w) enStatus(`¡Perfecto! Ahora prueba "De memoria", o toca Siguiente.`,"done"); },2500);
+  } else {
+    enStatus(`Casi. Se escribe "${answers[0]}". Las letras en naranja son las que cambian. Inténtalo otra vez.`,"bad");
+    speak(answers[0],"en",true);
+  }
+}
+$("#enCheck").onclick=enCheck; $("#enInput").addEventListener("keydown",e=>{ if(e.key==="Enter") enCheck(); });
+$("#enNext").onclick=()=>{ EN.idx=(EN.idx+1)%EN.list.length; enLoad(); };
+$("#enPrev").onclick=()=>{ EN.idx=(EN.idx-1+EN.list.length)%EN.list.length; enLoad(); };
+function practiceEnglish(en,cat){
+  if(cat && cat!==EN.cat){ EN.cat=cat; store.set("enCat",cat); renderEnCats(); enBuildList(); }
+  const i=EN.list.findIndex(w=>w.en===en); EN.idx = i<0?0:i;
+  showView("escribir"); setWriteLang("en"); enLoad(); window.scrollTo({top:0,behavior:"smooth"});
+}
+if(!VOCAB[EN.cat] && EN.cat!=="Todas") EN.cat="Básicos";
+document.querySelectorAll("[data-enmode]").forEach(x=>x.setAttribute("aria-pressed",String(x.dataset.enmode===EN.mode)));
+renderEnCats(); enBuildList();
+if(document.fonts && document.fonts.ready) document.fonts.ready.then(()=>enResize());
+
+/* ---------- Clase: lecciones con maestra, oraciones y ejercicios ---------- */
+const pickR = a => a[Math.floor(Math.random()*a.length)];
+const capF = s => s.charAt(0).toUpperCase()+s.slice(1);
+const hasB = w => { const c=w.charCodeAt(w.length-1)-0xAC00; return c>=0 && c<11172 && c%28!==0; };
+const PP = (w,a,b) => w+(hasB(w)?a:b);
+// [ko, es indef, es def, es sin artículo, en indef, en def, género]
+const CN = [
+ ["책","un libro","el libro","libro","a book","the book","m"],["가방","una bolsa","la bolsa","bolsa","a bag","the bag","f"],
+ ["연필","un lápiz","el lápiz","lápiz","a pencil","the pencil","m"],["의자","una silla","la silla","silla","a chair","the chair","f"],
+ ["사과","una manzana","la manzana","manzana","an apple","the apple","f"],["휴대폰","un celular","el celular","celular","a phone","the phone","m"],
+ ["고양이","un gato","el gato","gato","a cat","the cat","m"],["시계","un reloj","el reloj","reloj","a watch","the watch","m"],
+ ["꽃","una flor","la flor","flor","a flower","the flower","f"],["우산","un paraguas","el paraguas","paraguas","an umbrella","the umbrella","m"],
+ ["컴퓨터","una computadora","la computadora","computadora","a computer","the computer","f"],["계란","un huevo","el huevo","huevo","an egg","the egg","m"],
+ ["오렌지","una naranja","la naranja","naranja","an orange","the orange","f"],["코끼리","un elefante","el elefante","elefante","an elephant","the elephant","m"],
+ ["개","un perro","el perro","perro","a dog","the dog","m"],["차","un carro","el carro","carro","a car","the car","m"]
+].map(([ko,ei,ed,eb,ea,ede,g])=>({ko,ei,ed,eb,ea,ede,g}));
+const CNfind = ko => CN.find(n=>n.ko===ko);
+// Cosas que gustan: [ko, es con artículo, plural, en]
+const LIKES = [["커피","el café",0,"coffee"],["김치","el kimchi",0,"kimchi"],["음악","la música",0,"music"],["고양이","los gatos",1,"cats"],
+ ["개","los perros",1,"dogs"],["한국어","el coreano",0,"Korean"],["영화","las películas",1,"movies"],["꽃","las flores",1,"flowers"],
+ ["빵","el pan",0,"bread"],["사과","las manzanas",1,"apples"],["비","la lluvia",0,"rain"],["피자","la pizza",0,"pizza"],["초콜릿","el chocolate",0,"chocolate"]]
+ .map(([ko,es,p,en])=>({ko,es,p,en}));
+// Verbos: coreano + inglés + español (yo, tú, ella, él, nosotros, ellos)
+const VB = [
+ {ko:"먹어요",en:"eat",en3:"eats",ing:"eating",es:["como","comes","come","come","comemos","comen"],esg:"comiendo",
+  objs:[["밥","arroz","rice"],["빵","pan","bread"],["사과","manzanas","apples"],["피자","pizza","pizza"]]},
+ {ko:"마셔요",en:"drink",en3:"drinks",ing:"drinking",es:["bebo","bebes","bebe","bebe","bebemos","beben"],esg:"bebiendo",
+  objs:[["물","agua","water"],["커피","café","coffee"],["우유","leche","milk"],["차","té","tea"]]},
+ {ko:"읽어요",en:"read",en3:"reads",ing:"reading",es:["leo","lees","lee","lee","leemos","leen"],esg:"leyendo",
+  objs:[["책","libros","books"],["신문","el periódico","the newspaper"]]},
+ {ko:"봐요",en:"watch",en3:"watches",ing:"watching",es:["veo","ves","ve","ve","vemos","ven"],esg:"viendo",
+  objs:[["영화","películas","movies"],["드라마","dramas coreanos","K-dramas"],["텔레비전","la tele","TV"]]},
+ {ko:"공부해요",ko_neg:"공부 안 해요",en:"study",en3:"studies",ing:"studying",es:["estudio","estudias","estudia","estudia","estudiamos","estudian"],esg:"estudiando",
+  objs:[["한국어","coreano","Korean"],["영어","inglés","English"],["수학","matemáticas","math"]]},
+ {ko:"들어요",en:"listen to",en3:"listens to",ing:"listening to",es:["escucho","escuchas","escucha","escucha","escuchamos","escuchan"],esg:"escuchando",
+  objs:[["음악","música","music"],["노래","canciones","songs"],["라디오","la radio","the radio"]]},
+ {ko:"말해요",en:"speak",en3:"speaks",ing:"speaking",es:["hablo","hablas","habla","habla","hablamos","hablan"],esg:"hablando",
+  objs:[["스페인어","español","Spanish"],["영어","inglés","English"],["한국어","coreano","Korean"]], koObj:"로"},
+ {ko:"요리해요",ko_neg:"요리 안 해요",en:"cook",en3:"cooks",ing:"cooking",es:["cocino","cocinas","cocina","cocina","cocinamos","cocinan"],esg:"cocinando",
+  objs:[["저녁","la cena","dinner"],["밥","arroz","rice"],["파스타","pasta","pasta"]]}
+];
+const SUBJ = [{en:"I",es:"Yo",i:0},{en:"You",es:"Tú",i:1},{en:"She",es:"Ella",i:2,t:1},{en:"He",es:"Él",i:3,t:1},{en:"We",es:"Nosotros",i:4},{en:"They",es:"Ellos",i:5}];
+const BE = ["am","are","is","is","are","are"], ESTAR=["estoy","estás","está","está","estamos","están"], TENER=["tengo","tienes","tiene","tiene","tenemos","tienen"], PODER=["puedo","puedes","puede","puede","podemos","pueden"];
+const sObj = (o,v) => v.koObj==="로" ? null : o; // "hablar" en coreano usa otra estructura: lo evitamos en oraciones con 을/를
+const koVerbs = VB.filter(v=>v.koObj!=="로");
+
+const CLASSES = {
+ ko: [
+  {id:"k1", emoji:"👉", title:"Esto es…", pat:`이거 <b>N</b> + <i>이에요 / 예요</i>`,
+   teach:[`¡Hola, Berenice! Hoy aprendes tu primera oración en coreano: cómo decir <b>"Esto es…"</b>.`,
+          `<b>이거</b> (igeo) significa "esto". Después va la cosa, y al final <b>이에요</b> o <b>예요</b>, que significa "es".`,
+          `Regla fácil: si la palabra termina en <b>consonante</b> (tiene letra abajo, como 책), usa <b>이에요</b>: 책이에요. Si termina en <b>vocal</b> (como 사과), usa <b>예요</b>: 사과예요.`,
+          `En coreano no existe "un" ni "una". 책 = libro, un libro o el libro.`],
+   tip:"Letra abajo (consonante) → 이에요. Sin letra abajo (vocal) → 예요.",
+   gen(){ const n=pickR(CN.filter(n=>n.ko!=="차")); const far=Math.random()<0.3;
+     return {ko:`${far?"저거":"이거"} ${PP(n.ko,"이에요","예요")}.`, es:`${far?"Eso":"Esto"} es ${n.ei}.`, en:`${far?"That":"This"} is ${n.ea}.`}; }},
+  {id:"k2", emoji:"🙋‍♀️", title:"Yo soy…", pat:`저는 <b>N</b> + <i>이에요 / 예요</i>`,
+   teach:[`Ahora vas a presentarte. <b>저는</b> (jeoneun) significa "yo" de forma educada.`,
+          `La forma es: <b>저는 + quién eres + 이에요/예요</b>. Es la misma regla de la clase anterior.`,
+          `Ejemplo: <b>저는 베레니세예요</b> = Soy Berenice. 베레니세 termina en vocal (세), por eso va 예요.`,
+          `<b>는</b> marca de quién hablas (el tema). Va después de vocal; después de consonante sería <b>은</b>.`],
+   tip:"저는 = yo. Luego quién eres + 이에요 (consonante) o 예요 (vocal).",
+   gen(){ const r=pickR([["학생","estudiante","a student"],["선생님","maestra","a teacher"],["의사","doctora","a doctor"],["간호사","enfermera","a nurse"],["회사원","empleada de oficina","an office worker"],["요리사","cocinera","a cook"],["가수","cantante","a singer"],["베레니세","Berenice","Berenice"]]);
+     return {ko:`저는 ${PP(r[0],"이에요","예요")}.`, es:`Soy ${r[1]}.`, en:`I am ${r[2]}.`}; }},
+  {id:"k3", emoji:"🎒", title:"Tengo / No tengo", pat:`<b>N</b> + <i>이 / 가</i> + 있어요 / 없어요`,
+   teach:[`Para decir que <b>tienes</b> algo, en coreano dices literalmente "algo existe": <b>N이/가 있어요</b>.`,
+          `<b>있어요</b> = hay / tengo. <b>없어요</b> = no hay / no tengo. ¡Así de fácil se niega!`,
+          `La partícula: después de consonante <b>이</b> (책이), después de vocal <b>가</b> (시계가).`],
+   tip:"Consonante → 이, vocal → 가. 있어요 = tengo, 없어요 = no tengo.",
+   gen(){ const n=pickR(CN); const neg=Math.random()<0.45;
+     return {ko:`${PP(n.ko,"이","가")} ${neg?"없어요":"있어요"}.`, es: neg?`No tengo ${n.eb}.`:`Tengo ${n.ei}.`, en: neg?`I don't have ${n.ea}.`:`I have ${n.ea}.`}; }},
+  {id:"k4", emoji:"💗", title:"Me gusta…", pat:`저는 <b>N</b> + <i>을 / 를</i> + 좋아해요`,
+   teach:[`¡Vamos a decir lo que te gusta! <b>좋아해요</b> (joahaeyo) = me gusta.`,
+          `En coreano el verbo va <b>al final</b>. Primero dices quién, luego qué, y al final la acción: <b>저는 커피를 좋아해요</b> = (Yo) café me gusta.`,
+          `<b>을 / 를</b> marca la cosa que te gusta (el objeto). Después de consonante <b>을</b> (음악을), después de vocal <b>를</b> (커피를).`],
+   tip:"El verbo va al final. Consonante → 을, vocal → 를.",
+   gen(){ const x=pickR(LIKES); return {ko:`저는 ${PP(x.ko,"을","를")} 좋아해요.`, es:`Me gusta${x.p?"n":""} ${x.es}.`, en:`I like ${x.en}.`}; }},
+  {id:"k5", emoji:"🍚", title:"Lo que hago cada día", pat:`<b>quién</b>는 + <b>qué</b>을/를 + <b>verbo</b>`,
+   teach:[`Ahora usas verbos: <b>먹어요</b> (como), <b>마셔요</b> (bebo), <b>읽어요</b> (leo), <b>봐요</b> (veo), <b>공부해요</b> (estudio), <b>들어요</b> (escucho), <b>요리해요</b> (cocino).`,
+          `El orden siempre es: <b>quién + qué + verbo</b>. Ejemplo: <b>저는 밥을 먹어요</b> = Yo como arroz.`,
+          `Lo mejor: el verbo coreano <b>no cambia</b> con la persona. 저는 먹어요 (yo como), 친구는 먹어요 (mi amigo come). ¡Igual!`],
+   tip:"Quién + qué + verbo al final. El verbo no cambia con la persona.",
+   gen(){ const v=pickR(koVerbs), o=pickR(v.objs), s=pickR([["저는","",0],["친구는","Mi amigo ",2],["엄마는","Mi mamá ",2]]);
+     const es=(s[1]+v.es[s[2]]).trim(); return {ko:`${s[0]} ${PP(o[0],"을","를")} ${v.ko}.`, es:`${capF(es)} ${o[1]}.`, en:`${s[2]?(s[0]==="친구는"?"My friend":"My mom"):"I"} ${s[2]?v.en3:v.en} ${o[2]}.`}; }},
+  {id:"k6", emoji:"🚶‍♀️", title:"Voy a…", pat:`저는 + <b>lugar</b>에 + 가요`,
+   teach:[`<b>가요</b> (gayo) = voy. Para decir <b>a dónde</b>, pones <b>에</b> justo después del lugar: <b>학교에</b> = a la escuela.`,
+          `<b>저는 학교에 가요</b> = Voy a la escuela.`,
+          `Puedes agregar cuándo al inicio: <b>오늘</b> (hoy), <b>내일</b> (mañana). <b>저는 내일 공원에 가요</b> = Mañana voy al parque.`],
+   tip:"Lugar + 에 = a ese lugar. 가요 = voy.",
+   gen(){ const p=pickR([["학교","a la escuela","to school"],["회사","al trabajo","to work"],["집","a casa","home"],["병원","al hospital","to the hospital"],["시장","al mercado","to the market"],["공원","al parque","to the park"],["한국","a Corea","to Korea"],["카페","a la cafetería","to the café"],["은행","al banco","to the bank"]]);
+     const t=pickR([null,null,["오늘","Hoy","today"],["내일","Mañana","tomorrow"]]);
+     const kp = p[0]==="집" ? "집에" : p[0]+"에";
+     return {ko:`저는 ${t?t[0]+" ":""}${kp} 가요.`, es: t?`${t[1]} voy ${p[1]}.`:`Voy ${p[1]}.`, en: t?`I am going ${p[2]} ${t[2]}.`:`I go ${p[2]}.`}; }},
+  {id:"k7", emoji:"🗺️", title:"¿Dónde está…?", pat:`<b>N</b> + 어디예요?`,
+   teach:[`Muy útil en un viaje: <b>어디예요?</b> (eodiyeyo) = ¿dónde está?`,
+          `Solo dices el lugar y luego 어디예요: <b>화장실 어디예요?</b> = ¿Dónde está el baño?`,
+          `Te pueden responder: <b>여기예요</b> (es aquí) o <b>저기예요</b> (es allá). Al preguntar, sube el tono al final.`],
+   tip:"Lugar + 어디예요? Respuestas: 여기예요 (aquí), 저기예요 (allá).",
+   gen(){ if(Math.random()<0.25){ const a=pickR([["여기예요.","Es aquí.","It's here."],["저기예요.","Es allá.","It's over there."]]); return {ko:a[0],es:a[1],en:a[2]}; }
+     const p=pickR([["화장실","el baño","the bathroom"],["역","la estación","the station"],["병원","el hospital","the hospital"],["은행","el banco","the bank"],["호텔","el hotel","the hotel"],["출구","la salida","the exit"],["지하철역","la estación del metro","the subway station"],["편의점","la tienda","the convenience store"]]);
+     return {ko:`${p[0]} 어디예요?`, es:`¿Dónde está ${p[1]}?`, en:`Where is ${p[2]}?`}; }},
+  {id:"k8", emoji:"✨", title:"Describir cosas", pat:`<b>N</b> + 이/가 + <b>adjetivo</b>`,
+   teach:[`En coreano los adjetivos funcionan como verbos y van al final: <b>커요</b> = es grande, <b>작아요</b> = es pequeño.`,
+          `Usas otra vez <b>이 / 가</b>: <b>가방이 예뻐요</b> = La bolsa es bonita.`,
+          `Más adjetivos: <b>예뻐요</b> (bonito), <b>비싸요</b> (caro), <b>싸요</b> (barato), <b>맛있어요</b> (delicioso).`],
+   tip:"Cosa + 이/가 + adjetivo al final (커요, 작아요, 예뻐요…).",
+   gen(){ const food=Math.random()<0.3;
+     if(food){ const f=pickR([["사과","la manzana","f","apple"],["빵","el pan","m","bread"],["김치","el kimchi","m","kimchi"],["피자","la pizza","f","pizza"],["커피","el café","m","coffee"]]);
+       return {ko:`${PP(f[0],"이","가")} 맛있어요.`, es:`${capF(f[1])} está ${f[2]==="f"?"deliciosa":"delicioso"}.`, en:`The ${f[3]} is delicious.`}; }
+     const n=pickR(CN.filter(n=>["책","가방","꽃","휴대폰","시계","컴퓨터","고양이","우산","차","의자"].includes(n.ko)));
+     const a=pickR([["커요","grande","grande","big"],["작아요","pequeño","pequeña","small"],["예뻐요","bonito","bonita","pretty"],["비싸요","caro","cara","expensive"],["싸요","barato","barata","cheap"]]);
+     return {ko:`${PP(n.ko,"이","가")} ${a[0]}.`, es:`${capF(n.ed)} es ${n.g==="f"?a[2]:a[1]}.`, en:`${capF(n.ede)} is ${a[3]}.`}; }},
+  {id:"k9", emoji:"🙅‍♀️", title:"No hago…", pat:`저는 + qué을/를 + <b>안</b> + verbo`,
+   teach:[`Para decir que <b>no</b> haces algo, pones <b>안</b> (an) justo antes del verbo.`,
+          `<b>저는 커피를 안 마셔요</b> = No bebo café.`,
+          `Con verbos que terminan en <b>해요</b> (como 공부해요), el 안 va antes de 해요: <b>공부 안 해요</b> = no estudio.`],
+   tip:"안 va justo antes del verbo. 공부해요 → 공부 안 해요.",
+   gen(){ const v=pickR(koVerbs), o=pickR(v.objs);
+     return {ko:`저는 ${PP(o[0],"을","를")} ${v.ko_neg||("안 "+v.ko)}.`, es:`No ${v.es[0]} ${o[1]}.`, en:`I don't ${v.en} ${o[2]}.`}; }},
+  {id:"k10", emoji:"❓", title:"Preguntar y responder", pat:`… 좋아해요<b>?</b> → 네, … / 아니요, …`,
+   teach:[`En coreano, para preguntar no cambias el orden: solo <b>subes el tono</b> al final y pones <b>?</b>.`,
+          `<b>커피를 좋아해요?</b> = ¿Te gusta el café?`,
+          `Respondes con <b>네</b> (sí) o <b>아니요</b> (no): <b>네, 좋아해요</b> / <b>아니요, 안 좋아해요</b>.`],
+   tip:"Pregunta = misma oración con ? y tono arriba. 네 = sí, 아니요 = no.",
+   gen(){ const x=pickR(LIKES); const k=Math.random();
+     if(k<0.5) return {ko:`${PP(x.ko,"을","를")} 좋아해요?`, es:`¿Te gusta${x.p?"n":""} ${x.es}?`, en:`Do you like ${x.en}?`};
+     if(k<0.75) return {ko:`네, ${PP(x.ko,"을","를")} 좋아해요.`, es:`Sí, me gusta${x.p?"n":""} ${x.es}.`, en:`Yes, I like ${x.en}.`};
+     return {ko:`아니요, ${PP(x.ko,"을","를")} 안 좋아해요.`, es:`No, no me gusta${x.p?"n":""} ${x.es}.`, en:`No, I don't like ${x.en}.`}; }}
+ ],
+ en: [
+  {id:"e1", emoji:"😊", title:"I am / You are / She is", pat:`<b>I</b> am · <b>You / We / They</b> are · <b>He / She</b> is`,
+   teach:[`¡Hello, Berenice! Hoy aprendes el verbo más importante del inglés: <b>to be</b> (ser / estar).`,
+          `Cambia según la persona: <b>I am</b> (yo soy/estoy), <b>you are</b> (tú eres), <b>he is / she is</b> (él / ella es), <b>we are</b> (nosotros), <b>they are</b> (ellos).`,
+          `En inglés <b>siempre</b> se dice la persona. En español dices "Estoy feliz", pero en inglés es <b>I am happy</b>, nunca solo "Am happy".`],
+   tip:"I → am. He / She → is. You / We / They → are.",
+   gen(){ const s=pickR(SUBJ); const a=pickR([["happy","feliz","feliz","felices"],["tired","cansado","cansada","cansados"],["sad","triste","triste","tristes"],["busy","ocupado","ocupada","ocupados"],["sick","enfermo","enferma","enfermos"],["ready","listo","lista","listos"],["hungry","con hambre","con hambre","con hambre"]]);
+     const fem = s.i===0||s.i===2; const es = s.i>=4?a[3]:(fem?a[2]:a[1]);
+     return {en:`${s.en} ${BE[s.i]} ${a[0]}.`, es:`${s.es} ${ESTAR[s.i]} ${es}.`}; }},
+  {id:"e2", emoji:"🍎", title:"This is a… / an…", pat:`This / That is <b>a</b> + consonante · <b>an</b> + vocal`,
+   teach:[`<b>This is</b> = esto es (cerca). <b>That is</b> = eso es (lejos).`,
+          `"Un / una" en inglés es <b>a</b> o <b>an</b>. Usa <b>an</b> cuando la palabra empieza con sonido de vocal: <b>an apple</b>, <b>an egg</b>, <b>an umbrella</b>.`,
+          `Con consonante usa <b>a</b>: <b>a book</b>, <b>a cat</b>. ¡Y no importa si es masculino o femenino! En inglés no hay género.`],
+   tip:"a + consonante (a book). an + vocal (an apple).",
+   gen(){ const n=pickR(CN); const far=Math.random()<0.4; return {en:`${far?"That":"This"} is ${n.ea}.`, es:`${far?"Eso":"Esto"} es ${n.ei}.`, ko:`${far?"저거":"이거"} ${PP(n.ko,"이에요","예요")}.`}; }},
+  {id:"e3", emoji:"🐶", title:"I have / She has", pat:`I / You / We / They <b>have</b> · He / She <b>has</b>`,
+   teach:[`<b>have</b> = tener. <b>I have a dog</b> = Tengo un perro.`,
+          `¡Ojo! Con <b>he</b> y <b>she</b> cambia a <b>has</b>: <b>She has a cat</b> = Ella tiene un gato.`,
+          `Para negar: <b>I don't have</b>… y con he/she: <b>She doesn't have</b>… (después de doesn't vuelve a ser <b>have</b>).`],
+   tip:"He / She → has. Negativo: don't have / doesn't have.",
+   gen(){ const s=pickR(SUBJ); const n=pickR(CN.filter(n=>["가방","휴대폰","고양이","우산","컴퓨터","개","차","책","시계"].includes(n.ko)).concat([{ko:"오빠",ei:"un hermano",eb:"hermanos",ea:"a brother"},{ko:"언니",ei:"una hermana",eb:"hermanas",ea:"a sister"}]));
+     const neg=Math.random()<0.4;
+     if(neg) return {en:`${s.en} ${s.t?"doesn't":"don't"} have ${n.ea}.`, es:`${s.es} no ${TENER[s.i]} ${n.eb}.`};
+     return {en:`${s.en} ${s.t?"has":"have"} ${n.ea}.`, es:`${s.es} ${TENER[s.i]} ${n.ei}.`}; }},
+  {id:"e4", emoji:"💗", title:"I like / She likes", pat:`I <b>like</b> · She <b>likes</b> · I <b>don't like</b> · She <b>doesn't like</b>`,
+   teach:[`<b>like</b> = gustar. Pero en inglés se dice al revés que en español: <b>I like coffee</b> = "Yo gusto café" → Me gusta el café.`,
+          `Con <b>he / she</b> el verbo lleva <b>-s</b>: <b>She likes music</b>.`,
+          `Y casi nunca pones "the": <b>I like cats</b> = Me gustan los gatos.`],
+   tip:"He / She → likes. Negativo: don't like / doesn't like.",
+   gen(){ const s=pickR(SUBJ); const x=pickR(LIKES); const neg=Math.random()<0.35;
+     const pre=[["","me"],["","te"],["A ella ","le"],["A él ","le"],["","nos"],["A ellos ","les"]][s.i];
+     const es=capF(`${pre[0]}${neg?"no ":""}${pre[1]} gusta${x.p?"n":""} ${x.es}.`);
+     const v = neg ? (s.t?"doesn't like":"don't like") : (s.t?"likes":"like");
+     return {en:`${s.en} ${v} ${x.en}.`, es}; }},
+  {id:"e5", emoji:"🍳", title:"Lo que hago cada día", pat:`I / You / We / They <b>eat</b> · He / She <b>eats</b>`,
+   teach:[`Para hablar de lo que haces normalmente usas el <b>presente simple</b>: <b>I drink coffee</b> = Bebo café.`,
+          `La regla de oro: con <b>he / she</b> agrega <b>-s</b> al verbo: <b>she drinks</b>, <b>he reads</b>.`,
+          `Algunos llevan <b>-es</b> o <b>-ies</b>: watch → <b>watches</b>, study → <b>studies</b>.`],
+   tip:"He / She → verbo + s (eats, reads, watches, studies).",
+   gen(){ const s=pickR(SUBJ), v=pickR(VB), o=pickR(v.objs); return {en:`${s.en} ${s.t?v.en3:v.en} ${o[2]}.`, es:`${s.es} ${v.es[s.i]} ${o[1]}.`}; }},
+  {id:"e6", emoji:"❓", title:"Preguntas con Do / Does", pat:`<b>Do</b> you…? · <b>Does</b> she…? → Yes, I do. / No, I don't.`,
+   teach:[`Para preguntar en inglés pones <b>Do</b> al inicio: <b>Do you speak English?</b> = ¿Hablas inglés?`,
+          `Con he / she usas <b>Does</b>, y el verbo <b>pierde la -s</b>: <b>Does she like coffee?</b> (no "likes").`,
+          `Respuestas cortas: <b>Yes, I do.</b> / <b>No, I don't.</b> · <b>Yes, she does.</b> / <b>No, she doesn't.</b>`],
+   tip:"Do + I/you/we/they. Does + he/she, y el verbo sin -s.",
+   gen(){ const s=pickR(SUBJ.filter(x=>[1,2,3,5].includes(x.i))), v=pickR(VB), o=pickR(v.objs);
+     if(Math.random()<0.2){ const a=pickR([["Yes, I do.","Sí."],["No, I don't.","No."],["Yes, she does.","Sí (ella sí)."],["No, he doesn't.","No (él no)."]]); return {en:a[0],es:a[1]}; }
+     return {en:`${s.t?"Does":"Do"} ${s.en.toLowerCase()} ${v.en} ${o[2]}?`, es:`¿${s.es} ${v.es[s.i]} ${o[1]}?`}; }},
+  {id:"e7", emoji:"🗺️", title:"Where is…?", pat:`<b>Where is</b> the…? → It is <b>here</b> / <b>over there</b>`,
+   teach:[`<b>Where is…?</b> = ¿Dónde está…? <b>Where is the bathroom?</b> = ¿Dónde está el baño?`,
+          `Para responder: <b>It is here</b> (está aquí), <b>It is over there</b> (está allá), <b>on the left</b> (a la izquierda), <b>on the right</b> (a la derecha).`,
+          `<b>It's</b> es la forma corta de <b>It is</b>. Las dos están bien.`],
+   tip:"Where is the…? · here / over there / on the left / on the right.",
+   gen(){ const p=pickR([["the bathroom","el baño"],["the bank","el banco"],["the station","la estación"],["the hospital","el hospital"],["the park","el parque"],["my phone","mi celular"],["my bag","mi bolsa"],["the exit","la salida"]]);
+     if(Math.random()<0.5) return {en:`Where is ${p[0]}?`, es:`¿Dónde está ${p[1]}?`};
+     const w=pickR([["here","aquí"],["over there","allá"],["on the left","a la izquierda"],["on the right","a la derecha"]]);
+     return {en:`${capF(p[0])} is ${w[0]}.`, es:`${capF(p[1])} está ${w[1]}.`}; }},
+  {id:"e8", emoji:"🎨", title:"Colores y cosas", pat:`The car is <b>red</b> · a <b>red</b> car`,
+   teach:[`Los colores: <b>red</b> rojo, <b>blue</b> azul, <b>green</b> verde, <b>black</b> negro, <b>white</b> blanco, <b>yellow</b> amarillo, <b>pink</b> rosa, <b>purple</b> morado.`,
+          `Gran diferencia: en inglés el color va <b>antes</b> de la cosa. "Un carro rojo" = <b>a red car</b>.`,
+          `Y los colores <b>no cambian</b>: red sirve para rojo, roja, rojos y rojas.`],
+   tip:"El color va antes: a red car (un carro rojo).",
+   gen(){ const n=pickR([["car","carro","m"],["bag","bolsa","f"],["flower","flor","f"],["house","casa","f"],["cat","gato","m"],["shirt","camisa","f"],["book","libro","m"],["dress","vestido","m"],["phone","celular","m"],["cup","taza","f"]]);
+     const c=pickR([["red","rojo","roja"],["blue","azul","azul"],["green","verde","verde"],["black","negro","negra"],["white","blanco","blanca"],["yellow","amarillo","amarilla"],["pink","rosa","rosa"],["purple","morado","morada"]]);
+     const col=n[2]==="f"?c[2]:c[1], art=n[2]==="f"?"la":"el", un=n[2]==="f"?"una":"un";
+     if(Math.random()<0.5) return {en:`The ${n[0]} is ${c[0]}.`, es:`${capF(art)} ${n[1]} es ${col}.`};
+     return {en:`I have a ${c[0]} ${n[0]}.`, es:`Tengo ${un} ${n[1]} ${col}.`}; }},
+  {id:"e9", emoji:"⏳", title:"Lo que hago ahora (-ing)", pat:`I <b>am</b> eat<b>ing</b> · She <b>is</b> read<b>ing</b>`,
+   teach:[`Para lo que pasa <b>ahora mismo</b> usas <b>am / is / are + verbo con -ing</b>.`,
+          `<b>I am eating</b> = Estoy comiendo. <b>She is reading</b> = Ella está leyendo.`,
+          `Es como "estar + -ando / -iendo" en español. ¡Muy parecido!`],
+   tip:"am / is / are + verbo-ing (eating, reading, studying).",
+   gen(){ const s=pickR(SUBJ), v=pickR(VB), o=pickR(v.objs); return {en:`${s.en} ${BE[s.i]} ${v.ing} ${o[2]}.`, es:`${s.es} ${ESTAR[s.i]} ${v.esg} ${o[1]}.`}; }},
+  {id:"e10", emoji:"💪", title:"I can / I can't", pat:`I <b>can</b> swim · She <b>can't</b> drive`,
+   teach:[`<b>can</b> = poder / saber hacer algo. <b>I can swim</b> = Puedo nadar / Sé nadar.`,
+          `¡La más fácil! <b>can</b> nunca cambia: I can, she can, they can. Y el verbo después va normal, sin "to" y sin -s.`,
+          `Negativo: <b>can't</b> (cannot). <b>He can't dance</b> = Él no puede bailar.`],
+   tip:"can / can't + verbo normal. No cambia con la persona.",
+   gen(){ const s=pickR(SUBJ); const a=pickR([["swim","nadar"],["cook","cocinar"],["dance","bailar"],["sing","cantar"],["drive","manejar"],["speak Korean","hablar coreano"],["read Hangul","leer hangul"],["play the guitar","tocar la guitarra"],["ride a bike","andar en bici"]]);
+     const neg=Math.random()<0.4; return {en:`${s.en} ${neg?"can't":"can"} ${a[0]}.`, es:`${s.es} ${neg?"no ":""}${PODER[s.i]} ${a[1]}.`}; }}
+ ]
+};
+
+// Grupos para opciones de "completa"
+const EN_GROUPS=[["am","is","are"],["a","an"],["have","has"],["do","does"],["Do","Does"],["don't","doesn't"],["like","likes"],["can","can't"],["This","That"],["here","there"]];
+VB.forEach(v=>{ const a=v.en.split(" ")[0], b=v.en3.split(" ")[0]; EN_GROUPS.push([a,b,v.ing.split(" ")[0]]); });
+const KO_SWAPS=[["이에요","예요"],["은","는"],["이","가"],["을","를"],["있어요","없어요"]];
+function koVariants(tok){
+  const out=[]; const t=tok.replace(/[.?!]$/,"");
+  KO_SWAPS.forEach(([a,b])=>{ [[a,b],[b,a]].forEach(([x,y])=>{ if(t.endsWith(x) && t.length>x.length) out.push(t.slice(0,-x.length)+y); else if(t===x) out.push(y); }); });
+  return out;
+}
+function enVariants(tok){ const t=tok.replace(/[.?!,]$/,""); const g=EN_GROUPS.find(g=>g.includes(t)); return g?g.filter(x=>x!==t):[]; }
+const tokNorm = s => s.toLowerCase().replace(/[.?!,¿¡]/g,"").trim();
+const enNormS = s => s.toLowerCase().replace(/[’`]/g,"'").replace(/\bi'm\b/g,"i am").replace(/\bit's\b/g,"it is").replace(/\bdon't\b/g,"do not").replace(/\bdoesn't\b/g,"does not").replace(/\bcan't\b/g,"cannot").replace(/\bcan not\b/g,"cannot").replace(/[^a-z' ]/g," ").replace(/\s+/g," ").trim();
+
+const CL = { track: store.get("clTrack","ko"), cur:null, step:0, ex:[], k:0, right:0, answered:false, sents:[] };
+const clDone = () => store.get("clDone",{});
+function genSents(c,n){ const seen=new Set(), out=[]; let tries=0;
+  while(out.length<n && tries<300){ tries++; const s=c.gen(); const key=s.ko||s.en; if(!seen.has(key)){ seen.add(key); out.push(s); } }
+  return out; }
+const tgt = s => CL.track==="ko" ? s.ko : s.en;
+function sayT(s,slow){ speak(tgt(s), CL.track, slow); }
+
+function renderClassList(){
+  $("#clRoom").hidden=true; $("#clList").hidden=false;
+  document.querySelectorAll("[data-cltrack]").forEach(b=>b.setAttribute("aria-pressed",String(b.dataset.cltrack===CL.track)));
+  const box=$("#clCards"); box.innerHTML=""; const done=clDone(); const list=CLASSES[CL.track];
+  const next=list.findIndex(c=>!done[c.id]);
+  list.forEach((c,i)=>{ const d=document.createElement("button"); d.className="cl-card"+(i===next?" now":"");
+    const st=done[c.id]||0;
+    d.innerHTML=`<span class="cl-emoji">${c.emoji}</span><span class="cl-t"><b>Clase ${i+1}</b><span></span></span><span class="cl-stars">${"★".repeat(st)}${"☆".repeat(3-st)}</span>`;
+    d.querySelector(".cl-t span").textContent=c.title; d.onclick=()=>openClass(c.id); box.appendChild(d); });
+  $("#clIntro").textContent = CL.track==="ko" ? "Clases de coreano: la maestra te explica, ves ejemplos y practicas armando oraciones." : "Clases de inglés: la maestra te explica en español, ves ejemplos y practicas escribiendo oraciones.";
+}
+function teacher(html){ return `<div class="teacher"><div class="t-av" aria-hidden="true">👩‍🏫</div><div class="t-bubble">${html}</div></div>`; }
+function clHeader(){
+  const c=CL.cur; const steps=["Explicación","Ejemplos","Práctica","Resultado"];
+  $("#clTitle").textContent=`${c.emoji} ${c.title}`;
+  $("#clSteps").innerHTML=steps.map((s,i)=>`<span class="${i===CL.step?"on":i<CL.step?"done":""}">${i+1}. ${s}</span>`).join("");
+}
+function openClass(id){
+  CL.cur=CLASSES[CL.track].find(c=>c.id===id); CL.step=0;
+  $("#clList").hidden=true; $("#clRoom").hidden=false; renderStep(); window.scrollTo({top:0,behavior:"smooth"});
+}
+function sentRow(s){
+  const d=document.createElement("div"); d.className="ex-sent";
+  const main = CL.track==="ko" ? `<div class="s-main kr"></div><div class="s-rom"></div>` : `<div class="s-main"></div>`;
+  d.innerHTML=`<div class="s-text">${main}<div class="s-es"></div></div><div class="s-btns"><button class="btn" aria-label="Escuchar">🔊</button><button class="btn" aria-label="Escuchar lento">🐢</button></div>`;
+  d.querySelector(".s-main").textContent=tgt(s); if(CL.track==="ko") d.querySelector(".s-rom").textContent=romOf(s.ko.replace(/[.?!]/g,""));
+  d.querySelector(".s-es").textContent = s.es + (CL.track==="ko"&&s.en?`  ·  ${s.en}`:"");
+  const [b1,b2]=d.querySelectorAll("button"); b1.onclick=()=>sayT(s); b2.onclick=()=>sayT(s,true);
+  return d;
+}
+function renderStep(){
+  clHeader(); const c=CL.cur, body=$("#clBody"); body.innerHTML="";
+  if(CL.step===0){
+    body.insertAdjacentHTML("beforeend", teacher(c.teach.map(p=>`<p>${p}</p>`).join("")));
+    body.insertAdjacentHTML("beforeend", `<div class="pattern"><span class="hint">La fórmula</span><div class="${CL.track==="ko"?"kr":""}">${c.pat}</div></div>`);
+    body.insertAdjacentHTML("beforeend", `<div class="row" style="justify-content:flex-end"><button class="btn primary" id="clGo1">Ver ejemplos →</button></div>`);
+    $("#clGo1").onclick=()=>{ CL.step=1; CL.sents=genSents(c,5); renderStep(); };
+  } else if(CL.step===1){
+    body.insertAdjacentHTML("beforeend", teacher(`<p>Escucha cada oración y repítela en voz alta. Fíjate en la fórmula: <b class="${CL.track==="ko"?"kr":""}">${c.pat}</b></p>`));
+    const list=document.createElement("div"); list.className="ex-list"; CL.sents.forEach(s=>list.appendChild(sentRow(s))); body.appendChild(list);
+    body.insertAdjacentHTML("beforeend", `<div class="row" style="justify-content:space-between"><button class="btn" id="clMore">🔄 Otros ejemplos</button><button class="btn primary" id="clGo2">¡A practicar! →</button></div>`);
+    $("#clMore").onclick=()=>{ CL.sents=genSents(c,5); renderStep(); };
+    $("#clGo2").onclick=()=>startPractice();
+  } else if(CL.step===2){ renderEx(); }
+  else renderResult();
+}
+function startPractice(){
+  const c=CL.cur; const sents=genSents(c,8);
+  const types = CL.track==="ko" ? ["mean","tiles","blank","listen","tiles","mean","blank","tiles"] : ["mean","tiles","blank","write","listen","tiles","blank","write"];
+  CL.ex=sents.map((s,i)=>({type:types[i%types.length], s}));
+  CL.pool=genSents(c,14); CL.k=0; CL.right=0; CL.step=2; renderStep();
+}
+const RIGHT=["¡Muy bien, Berenice! 👏","¡Excelente! ⭐","¡Eso es! Vas genial.","¡Perfecto! 💗","¡Bravo! Lo estás logrando."];
+function exFeedback(ok, correctHtml){
+  const fb=$("#exFb"); fb.className="status "+(ok?"done":"bad");
+  fb.innerHTML = ok ? pickR(RIGHT) : `Casi. La respuesta es: <b>${correctHtml}</b><br><span class="hint">Recuerda: ${CL.cur.tip}</span>`;
+  CL.answered=true; if(ok) CL.right++; bump();
+  $("#exNext").hidden=false; $("#exNext").focus({preventScroll:true});
+  sayT(CL.ex[CL.k].s);
+}
+const esc = s => s.replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+function otherSents(s,n,key){ return shuffle(CL.pool.filter(x=>key(x)!==key(s))).filter((x,i,a)=>a.findIndex(y=>key(y)===key(x))===i).slice(0,n); }
+function renderEx(){
+  const body=$("#clBody"); const e=CL.ex[CL.k], s=e.s; CL.answered=false;
+  const isKo=CL.track==="ko";
+  body.innerHTML=`<div class="row" style="justify-content:space-between"><span class="progress">Ejercicio ${CL.k+1} de ${CL.ex.length}</span><span class="progress">${CL.right} bien</span></div>
+    <div class="goalbar" aria-hidden="true"><i style="width:${Math.round(CL.k/CL.ex.length*100)}%"></i></div>
+    <p class="ex-ask" id="exAsk"></p><div id="exQ" class="ex-q"></div><div id="exA"></div>
+    <div class="status" id="exFb" role="status"></div>
+    <div class="row" style="justify-content:flex-end"><button class="btn primary" id="exNext" hidden>Siguiente →</button></div>`;
+  $("#exNext").onclick=()=>{ CL.k++; if(CL.k>=CL.ex.length){ CL.step=3; } renderStep(); };
+  const ask=$("#exAsk"), q=$("#exQ"), A=$("#exA");
+  if(e.type==="mean"){
+    ask.textContent="¿Qué significa esta oración?";
+    q.innerHTML=`<div class="s-main ${isKo?"kr":""}"></div>${isKo?`<div class="s-rom"></div>`:""}<button class="btn" id="exPlay">🔊 Escuchar</button>`;
+    q.querySelector(".s-main").textContent=tgt(s); if(isKo) q.querySelector(".s-rom").textContent=romOf(s.ko.replace(/[.?!]/g,""));
+    $("#exPlay").onclick=()=>sayT(s); sayT(s);
+    const opts=shuffle([s,...otherSents(s,3,x=>x.es)]);
+    A.className="opts"; opts.forEach(o=>{ const b=document.createElement("button"); b.textContent=o.es;
+      b.onclick=()=>{ if(CL.answered) return; const ok=o===s; b.classList.add(ok?"right":"wrong"); [...A.children].forEach((c,i)=>{ if(opts[i]===s) c.classList.add("right"); }); exFeedback(ok, esc(s.es)); };
+      A.appendChild(b); });
+  } else if(e.type==="listen"){
+    ask.textContent = isKo ? "Escucha y elige la oración que oíste." : "Escucha y escribe lo que oíste en inglés.";
+    q.innerHTML=`<div class="row" style="justify-content:center"><button class="btn primary" id="exPlay">🔊 Escuchar</button><button class="btn" id="exSlow">🐢 Lento</button></div>`;
+    $("#exPlay").onclick=()=>sayT(s); $("#exSlow").onclick=()=>sayT(s,true); setTimeout(()=>sayT(s),300);
+    if(isKo){
+      const opts=shuffle([s,...otherSents(s,3,x=>x.ko)]); A.className="opts";
+      opts.forEach(o=>{ const b=document.createElement("button"); b.className="kr"; b.style.fontSize="19px"; b.textContent=o.ko;
+        b.onclick=()=>{ if(CL.answered) return; const ok=o===s; b.classList.add(ok?"right":"wrong"); [...A.children].forEach((c,i)=>{ if(opts[i]===s) c.classList.add("right"); }); exFeedback(ok, esc(s.ko)+" = "+esc(s.es)); };
+        A.appendChild(b); });
+    } else writeBox(A, s, "Escribe lo que oíste");
+  } else if(e.type==="write"){
+    ask.textContent="Escribe esta oración en inglés:"; q.innerHTML=`<div class="s-es-big"></div>`; q.firstChild.textContent=s.es;
+    writeBox(A, s, "Escríbela en inglés");
+  } else if(e.type==="tiles"){
+    ask.textContent = isKo ? "Arma la oración en coreano tocando las fichas en orden:" : "Arma la oración en inglés tocando las palabras en orden:";
+    q.innerHTML=`<div class="s-es-big"></div>`; q.firstChild.textContent=s.es;
+    const toks=tgt(s).split(" ");
+    const clean=toks.map(t=>t.replace(/[.?!]$/,""));
+    const otherToks=[...new Set(CL.pool.flatMap(x=>tgt(x).split(" ").map(t=>t.replace(/[.?!]$/,""))))].filter(t=>!clean.includes(t) && !clean.map(tokNorm).includes(tokNorm(t)));
+    const extras=shuffle(otherToks).slice(0, clean.length>=4?2:1);
+    const tiles=shuffle([...clean,...extras].map((t,i)=>({t,i})));
+    A.className="tiles-wrap";
+    A.innerHTML=`<div class="tiles-ans" id="tAns" aria-label="Tu oración"></div><div class="tiles-pool" id="tPool"></div><div class="row" style="justify-content:center"><button class="btn" id="tClr">Borrar</button><button class="btn primary" id="tChk">Revisar</button></div>`;
+    const picked=[];
+    const draw=()=>{ const ans=$("#tAns"), pool=$("#tPool"); ans.innerHTML=""; pool.innerHTML="";
+      if(!picked.length) ans.innerHTML=`<span class="hint">Toca las fichas de abajo…</span>`;
+      picked.forEach((tile,k)=>{ const b=tileBtn(tile.t); b.onclick=()=>{ if(CL.answered) return; picked.splice(k,1); draw(); }; ans.appendChild(b); });
+      tiles.forEach(tile=>{ const b=tileBtn(tile.t); if(picked.includes(tile)){ b.disabled=true; b.classList.add("used"); } b.onclick=()=>{ if(CL.answered||picked.includes(tile)) return; picked.push(tile); if(isKo) speak(tile.t,"ko"); draw(); }; pool.appendChild(b); }); };
+    const tileBtn=t=>{ const b=document.createElement("button"); b.className="tile"+(isKo?" kr":""); b.innerHTML=`<span></span>${isKo?`<small>${esc(romOf(t))}</small>`:""}`; b.firstChild.textContent=t; return b; };
+    draw();
+    $("#tClr").onclick=()=>{ if(CL.answered) return; picked.length=0; draw(); };
+    $("#tChk").onclick=()=>{ if(CL.answered||!picked.length) return; const got=picked.map(p=>tokNorm(p.t)).join(" "); const ok=got===clean.map(tokNorm).join(" ");
+      exFeedback(ok, esc(tgt(s))); $("#tAns").classList.add(ok?"ok":"no"); };
+  } else if(e.type==="blank"){
+    const toks=tgt(s).split(" ");
+    let idxs=toks.map((t,i)=>i).filter(i=>(isKo?koVariants(toks[i]):enVariants(toks[i])).length);
+    if(!idxs.length) idxs=toks.map((t,i)=>i).filter(i=>i>0||toks.length===1);
+    const bi=pickR(idxs); const punct=(toks[bi].match(/[.?!]$/)||[""])[0]; const ans=toks[bi].replace(/[.?!]$/,"");
+    let wrong=(isKo?koVariants(ans):enVariants(ans));
+    CL.pool.forEach(x=>{ const t2=tgt(x).split(" "); if(t2.length===toks.length){ const w=t2[bi].replace(/[.?!]$/,""); if(w!==ans) wrong.push(w); } });
+    wrong=[...new Set(wrong)].filter(w=>w!==ans);
+    const opts=shuffle([ans,...shuffle(wrong).slice(0,3)]);
+    ask.textContent="Completa la oración con la palabra correcta:";
+    q.innerHTML=`<div class="s-main ${isKo?"kr":""}"></div><div class="s-es"></div>`;
+    q.querySelector(".s-main").innerHTML=toks.map((t,i)=>i===bi?`<span class="blank">____</span>${punct}`:esc(t)).join(" ");
+    q.querySelector(".s-es").textContent=s.es;
+    A.className="opts"; opts.forEach(o=>{ const b=document.createElement("button"); if(isKo){ b.className="kr"; b.style.fontSize="19px"; } b.textContent=o;
+      b.onclick=()=>{ if(CL.answered) return; const ok=o===ans; b.classList.add(ok?"right":"wrong"); [...A.children].forEach((c,i)=>{ if(opts[i]===ans) c.classList.add("right"); });
+        q.querySelector(".blank").textContent=ans; exFeedback(ok, esc(tgt(s))); };
+      A.appendChild(b); });
+  }
+}
+function writeBox(A, s, ph){
+  A.className="en-check"; A.style.margin="0 auto";
+  A.innerHTML=`<input type="text" id="exIn" autocomplete="off" autocapitalize="sentences" autocorrect="off" spellcheck="false"><button class="btn primary" id="exChk">Revisar</button>`;
+  const inp=$("#exIn"); inp.placeholder=ph+" (teclado o Apple Pencil)";
+  const check=()=>{ if(CL.answered) return; const v=enNormS(inp.value); if(!v) return;
+    const target=enNormS(s.en); const ok=v===target;
+    let html=esc(s.en);
+    if(!ok){ const tw=s.en.replace(/[.?!]$/,"").split(" "), uw=v.split(" ");
+      html=tw.map((w,i)=>enNormS(w)===(uw[i]||"")?esc(w):`<u>${esc(w)}</u>`).join(" ")+(s.en.match(/[.?!]$/)||[""])[0]; }
+    exFeedback(ok, html); };
+  $("#exChk").onclick=check; inp.addEventListener("keydown",e=>{ if(e.key==="Enter") check(); });
+}
+function renderResult(){
+  const n=CL.ex.length, pct=CL.right/n, stars=pct>=0.9?3:pct>=0.7?2:1;
+  const d=clDone(); d[CL.cur.id]=Math.max(d[CL.cur.id]||0,stars); store.set("clDone",d);
+  const list=CLASSES[CL.track]; const i=list.indexOf(CL.cur); const nxt=list[i+1];
+  const msg = stars===3 ? "¡Clase perfecta, Berenice! Estoy muy orgullosa de ti. 🎉" : stars===2 ? "¡Muy buen trabajo! Repite la clase cuando quieras para sacar 3 estrellas." : "Vas aprendiendo. Repasa la explicación y vuelve a practicar, ¡cada intento cuenta!";
+  const body=$("#clBody");
+  body.innerHTML = teacher(`<p><b>${CL.right} de ${n}</b> correctas.</p><p>${msg}</p><p class="hint">Recuerda: ${esc(CL.cur.tip)}</p>`) +
+    `<div class="cl-big-stars">${"★".repeat(stars)}${"☆".repeat(3-stars)}</div>
+     <div class="row" style="justify-content:center">
+      <button class="btn" id="clAgain">🔄 Repetir con oraciones nuevas</button>
+      ${CL.track==="ko"?`<button class="btn" id="clWrite">✍️ Escribir las oraciones con el lápiz</button>`:`<button class="btn" id="clWriteEn">✍️ Practicar la escritura en inglés</button>`}
+      ${nxt?`<button class="btn primary" id="clNext">Siguiente clase →</button>`:`<button class="btn primary" id="clBack2">Ver todas las clases</button>`}
+     </div>`;
+  $("#clAgain").onclick=()=>startPractice();
+  if($("#clWrite")) $("#clWrite").onclick=()=>practiceWord(CL.ex.slice(0,3).map(e=>e.s.ko).join(" "));
+  if($("#clWriteEn")) $("#clWriteEn").onclick=()=>{ showView("escribir"); setWriteLang("en"); };
+  if(nxt) $("#clNext").onclick=()=>openClass(nxt.id); else $("#clBack2").onclick=renderClassList;
+  if(stars===3) speak(CL.track==="ko"?"잘했어요!":"Great job!", CL.track);
+}
+document.querySelectorAll("[data-cltrack]").forEach(b=>b.onclick=()=>{ CL.track=b.dataset.cltrack; store.set("clTrack",CL.track); renderClassList(); });
+$("#clBack").onclick=renderClassList;
+function nextClassToday(){ for(const tr of [CL.track, CL.track==="ko"?"en":"ko"]){ const c=CLASSES[tr].find(c=>!clDone()[c.id]); if(c){ CL.track=tr; return c; } } return CLASSES[CL.track][0]; }
+renderClassList();
+
+$("#btnClass").onclick=()=>{ const c=nextClassToday(); showView("clase"); openClass(c.id); };
 
 /* ---------- Pestañas ---------- */
 function showView(name){
   if(W.exam && name!=="escribir" && name!=="hoy"){ W.mode=W.exam.prevMode; W.exam=null; }
   document.querySelectorAll("nav.tabs button").forEach(b=>b.setAttribute("aria-selected",String(b.dataset.view===name)));
   document.querySelectorAll("section.view").forEach(s=>s.hidden = s.id!=="view-"+name);
-  if(name==="escribir") requestAnimationFrame(resize);
+  if(name==="escribir"){ requestAnimationFrame(resize); if(store.get("wl","ko")==="en") requestAnimationFrame(enResize); }
   if(name==="hoy") renderHoy();
   if(location.hash!=="#"+name) history.replaceState(null,"","#"+name);
   store.set("view",name);
@@ -812,11 +1512,12 @@ function renderWords(){
   VOCAB[curCat].forEach(([ko,es,en])=>{
     const d=document.createElement("div"); d.className="word";
     d.innerHTML=`<div class="ko"></div><div class="ro"></div><div class="tr"></div><div class="en"></div>
-      <div class="row"><button class="btn" data-a="ko">🔊 Coreano</button><button class="btn" data-a="en">🔊 Inglés</button><button class="btn" data-a="w">✍️ Escribir</button></div>`;
+      <div class="row"><button class="btn" data-a="ko">🔊 Coreano</button><button class="btn" data-a="en">🔊 Inglés</button><button class="btn" data-a="w">✍️ Coreano</button><button class="btn" data-a="we">✍️ Inglés</button></div>`;
     d.querySelector(".ko").textContent=ko; d.querySelector(".ro").textContent=romOf(ko); d.querySelector(".tr").textContent=es; d.querySelector(".en").textContent="EN: "+en;
     d.querySelector('[data-a="ko"]').onclick=()=>speak(ko,"ko");
     d.querySelector('[data-a="en"]').onclick=()=>speak(en,"en");
     d.querySelector('[data-a="w"]').onclick=()=>practiceWord(ko);
+    d.querySelector('[data-a="we"]').onclick=()=>practiceEnglish(en,curCat);
     w.appendChild(d);
   });
 }
@@ -1153,8 +1854,9 @@ const startList = curSet==="cons"?CONS.map(c=>c[0]) : curSet==="vow"?VOWS.map(v=
 loadItems(startList, store.get("pos:"+curSet,0), curSet);
 renderCats(); renderWords(); newQuiz(); renderSay();
 const startView=(location.hash||"").slice(1);
-const VIEWS=["hoy","escribir","palabras","hablar","traducir"];
+const VIEWS=["hoy","clase","escribir","palabras","hablar","traducir"];
 renderHoy();
+setWriteLang(store.get("wl","ko")); enLoad();
 showView(VIEWS.includes(startView)?startView:store.get("view","hoy"));
 window.addEventListener("hashchange",()=>{ const v=location.hash.slice(1); if(VIEWS.includes(v)) showView(v); });
 if("speechSynthesis" in window) speechSynthesis.getVoices();
