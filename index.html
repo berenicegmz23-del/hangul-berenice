@@ -150,6 +150,23 @@ textarea{min-height:110px;resize:vertical}
 .tile{border:1px solid var(--grid);background:var(--sheet);border-radius:12px;padding:8px 14px;min-height:48px;font-size:19px;font-weight:600;display:grid;justify-items:center;box-shadow:0 2px 0 var(--line)}
 .tile small{font-size:11.5px;color:var(--muted);font-family:var(--body);font-weight:500}
 .tile.used{opacity:.3}
+.gram-tag{color:var(--accent)}
+@media (max-width:600px){.ex-sent{flex-direction:column;align-items:stretch}.s-btns{justify-content:flex-end}}
+.gbox{display:grid;gap:6px}
+.gtable-wrap{overflow-x:auto;border:1px solid var(--line);border-radius:14px;-webkit-overflow-scrolling:touch}
+.gtable{border-collapse:collapse;width:100%;font-size:15.5px;background:var(--sheet)}
+.gtable th{background:var(--accent-soft);color:var(--accent);text-align:left;padding:8px 10px;white-space:nowrap;font-family:var(--body)}
+.gtable td{padding:7px 10px;border-top:1px solid var(--line);white-space:nowrap}
+.gtable td.es{color:var(--muted);font-family:var(--body)}
+.gtable td b{color:var(--ink)}
+.irr{font-size:11.5px;background:color-mix(in srgb,var(--gold) 22%,transparent);border-radius:6px;padding:1px 5px;font-family:var(--body)}
+.s-build{display:flex;flex-wrap:wrap;gap:5px;margin-top:6px}
+.pchip{display:grid;justify-items:center;border-radius:10px;padding:4px 9px;border:1px solid var(--line);background:var(--paper);line-height:1.25}
+.pchip b{font-size:16px}.pchip i{font-style:normal;font-size:12.5px;color:var(--ink)}.pchip small{font-size:10.5px;text-transform:uppercase;letter-spacing:.05em;color:var(--muted)}
+.pchip.r1{background:#FDE2EA;border-color:#F09DB4}.pchip.r2{background:#E7F0FD;border-color:#A9C3EE}.pchip.r3{background:#FBE6CF;border-color:#E8B678}
+.pchip.r4{background:#E9F6E6;border-color:#9CCB92}.pchip.r5{background:#EFE6FA;border-color:#C2A6E6}.pchip.r6{background:#F3F3F3;border-color:#CCC}
+.tile.ok{background:var(--accent-soft);border-color:var(--accent)}.tile.no{border-color:var(--warn);color:var(--warn)}
+mark{background:var(--accent-soft);color:var(--accent);border-radius:6px;padding:0 3px}
 .cl-big-stars{font-size:46px;color:var(--gold);text-align:center;letter-spacing:6px}
 .status u{text-decoration-color:var(--warn);text-decoration-thickness:3px}
 .lang-switch{display:flex;justify-content:center;margin-bottom:14px}
@@ -490,6 +507,7 @@ body{padding-top:env(safe-area-inset-top,0px)}
       <div class="row" style="justify-content:center">
         <button class="btn" id="sayListen">🔊 Escuchar</button>
         <button class="btn" id="saySlow">🐢 Lento</button>
+        <button class="btn" id="sayWords">🐌 Palabra por palabra</button>
         <button class="btn primary" id="sayMic" hidden>🎙️ Ahora tú</button>
         <button class="btn" id="sayNext">Siguiente →</button>
       </div>
@@ -729,10 +747,36 @@ function browserSpeak(text,lang,rate){
     speechSynthesis.speak(u); return true;
   }catch(e){ return false; }
 }
+let seqId=0;
+const waitMs = ms => new Promise(r=>setTimeout(r,ms));
+function speakOnce(text,lang,rate){
+  return new Promise(res=>{
+    const max=setTimeout(res, 1200+text.length*450);
+    const done=()=>{ clearTimeout(max); res(); };
+    if(tts){ tts.speak(text,{language:lang,rate}).then(done,done); return; }
+    try{
+      if(!("speechSynthesis" in window)){ done(); return; }
+      const u=new SpeechSynthesisUtterance(text);
+      u.lang = lang==="ko"?"ko-KR":lang==="en"?"en-US":"es-MX"; u.rate=rate;
+      const vs=speechSynthesis.getVoices().filter(v=>v.lang && v.lang.toLowerCase().startsWith(lang));
+      if(vs.length) u.voice=vs.find(v=>/natural|premium|enhanced|google/i.test(v.name))||vs[0];
+      u.onend=done; u.onerror=done; speechSynthesis.speak(u);
+    }catch(e){ done(); }
+  });
+}
+// Lee palabra por palabra, muy despacio, con pausas. Una sola palabra coreana se lee sílaba por sílaba.
+async function speakWords(text,lang,onWord){
+  const id=++seqId; try{ speechSynthesis.cancel(); }catch(e){}
+  let parts=text.replace(/[.?!,¿¡]/g,"").split(/\s+/).filter(Boolean);
+  if(parts.length===1 && lang==="ko") parts=[...parts[0]];
+  for(let i=0;i<parts.length;i++){ if(id!==seqId) return; if(onWord) onWord(i); await speakOnce(parts[i],lang,0.5); await waitMs(450); }
+  if(onWord && id===seqId) onWord(-1);
+}
 async function speak(text,lang,slow){
-  const rate = slow?0.7:1;
+  seqId++;
+  const rate = slow?0.5:1;
   if(tts){ try{ await tts.speak(text,{language:lang,rate}); return; }catch(e){ if(e&&e.code==="not_granted") tts=null; } }
-  if(!browserSpeak(text,lang,slow?0.6:0.9)) flash("Tu navegador no tiene voz disponible.","bad");
+  if(!browserSpeak(text,lang,slow?0.4:0.9)) flash("Tu navegador no tiene voz disponible.","bad");
 }
 
 /* ---------- Pizarra de escritura ---------- */
@@ -1296,6 +1340,212 @@ const CLASSES = {
  ]
 };
 
+/* ---------- Gramática: conjugaciones y cómo se arma una oración ---------- */
+// Verbos coreanos: d=diccionario, st=raíz, how=cómo se conjuga, formas por tiempo, es=[infinitivo, yo presente, yo pasado], en=[base, pasado]
+const KV = [
+ {d:"먹다",st:"먹",how:"vocal ㅓ → <b>어요</b>",pres:"먹어요",past:"먹었어요",fut:"먹을 거예요",form:"먹습니다",es:["comer","como","comí"],en:["eat","ate"],objs:[["밥","arroz","rice"],["빵","pan","bread"],["사과","una manzana","an apple"]]},
+ {d:"읽다",st:"읽",how:"vocal ㅣ → <b>어요</b>",pres:"읽어요",past:"읽었어요",fut:"읽을 거예요",form:"읽습니다",es:["leer","leo","leí"],en:["read","read"],objs:[["책","un libro","a book"],["신문","el periódico","the newspaper"]]},
+ {d:"마시다",st:"마시",how:"ㅣ + 어 = <b>여</b> → 마셔요",pres:"마셔요",past:"마셨어요",fut:"마실 거예요",form:"마십니다",es:["beber","bebo","bebí"],en:["drink","drank"],objs:[["물","agua","water"],["커피","café","coffee"],["우유","leche","milk"]]},
+ {d:"가다",st:"가",how:"vocal ㅏ → 아요, 가+아 = <b>가요</b>",pres:"가요",past:"갔어요",fut:"갈 거예요",form:"갑니다",es:["ir","voy","fui"],en:["go","went"],loc:1,objs:[["학교","a la escuela","to school"],["공원","al parque","to the park"],["시장","al mercado","to the market"]]},
+ {d:"사다",st:"사",how:"vocal ㅏ → 아요, 사+아 = <b>사요</b>",pres:"사요",past:"샀어요",fut:"살 거예요",form:"삽니다",es:["comprar","compro","compré"],en:["buy","bought"],objs:[["옷","ropa","clothes"],["가방","una bolsa","a bag"],["꽃","flores","flowers"]]},
+ {d:"만나다",st:"만나",how:"vocal ㅏ → 아요, 만나+아 = <b>만나요</b>",pres:"만나요",past:"만났어요",fut:"만날 거예요",form:"만납니다",es:["ver a","veo","vi"],en:["meet","met"],objs:[["친구","a una amiga","a friend"],["엄마","a mi mamá","my mom"]]},
+ {d:"보다",st:"보",how:"vocal ㅗ → 아요, 보+아 = <b>봐요</b>",pres:"봐요",past:"봤어요",fut:"볼 거예요",form:"봅니다",es:["ver","veo","vi"],en:["watch","watched"],objs:[["영화","una película","a movie"],["드라마","un drama","a K-drama"]]},
+ {d:"자다",st:"자",how:"vocal ㅏ → 아요, 자+아 = <b>자요</b>",pres:"자요",past:"잤어요",fut:"잘 거예요",form:"잡니다",es:["dormir","duermo","dormí"],en:["sleep","slept"],objs:[]},
+ {d:"공부하다",st:"공부하",how:"하다 → <b>해요</b> (siempre)",pres:"공부해요",past:"공부했어요",fut:"공부할 거예요",form:"공부합니다",es:["estudiar","estudio","estudié"],en:["study","studied"],objs:[["한국어","coreano","Korean"],["영어","inglés","English"]]},
+ {d:"일하다",st:"일하",how:"하다 → <b>해요</b> (siempre)",pres:"일해요",past:"일했어요",fut:"일할 거예요",form:"일합니다",es:["trabajar","trabajo","trabajé"],en:["work","worked"],objs:[]},
+ {d:"요리하다",st:"요리하",how:"하다 → <b>해요</b> (siempre)",pres:"요리해요",past:"요리했어요",fut:"요리할 거예요",form:"요리합니다",es:["cocinar","cocino","cociné"],en:["cook","cooked"],objs:[]}
+];
+const KT = {pres:"Presente", past:"Pasado", fut:"Futuro", form:"Formal"};
+function koWrong(v,t){
+  const w=[]; const s=v.st;
+  if(t==="pres"){ if(s.endsWith("하")) w.push(s+"요", s+"어요"); else { w.push(s+"아요", s+"어요", v.d+"요"); } }
+  if(t==="past"){ w.push(v.pres.replace(/요$/,"었어요"), v.d.replace(/다$/,"었어요"), v.d+"어요"); }
+  if(t==="fut"){ w.push(v.d+" 거예요", s+"을 거예요", s+"ㄹ 거예요"); }
+  if(t==="form"){ w.push(s+"습니다", s+"ㅂ니다", v.d+"니다"); }
+  return [...new Set(w)].filter(x=>x!==v[t] && !/[ㄱ-ㅎ]/.test(x)).concat(["pres","past","fut","form"].filter(k=>k!==t).map(k=>v[k]));
+}
+function koTenseSent(t){
+  const v=pickR(KV); const o=v.objs.length&&Math.random()<0.85 ? pickR(v.objs) : null;
+  const time = t==="past" ? ["어제","Ayer","Yesterday"] : t==="fut" ? ["내일","Mañana","Tomorrow"] : (Math.random()<0.4?["매일","Todos los días","every day"]:null);
+  const objKo = o ? (v.loc ? o[0]+"에" : PP(o[0],"을","를")) : null;
+  const esV = t==="past" ? v.es[2] : t==="fut" ? "voy a "+v.es[0].replace(/ a$/,"") : v.es[1];
+  let esObj = o ? o[1] : "";
+  const esTxt = (time&&t!=="pres"&&t!=="form" ? time[1]+" " : "") + esV + (esObj?" "+esObj:"") + (time&&(t==="pres"||t==="form") ? " "+time[1].toLowerCase() : "");
+  const enV = t==="past" ? v.en[1] : t==="fut" ? "will "+v.en[0] : v.en[0];
+  const enTxt = (t==="past"||t==="fut" ? time[2]+" " : "") + "I " + enV + (o?" "+o[2]:"") + (time&&(t==="pres"||t==="form") ? " "+time[2] : "");
+  const parts=[{t:"저는",g:"yo",r:"quién"}];
+  if(time) parts.push({t:time[0],g:time[1].toLowerCase(),r:"cuándo"});
+  if(o) parts.push({t:objKo,g:o[1].replace(/^a (la |una |mi )?/,"")+(v.loc?" (a dónde)":""),r:v.loc?"dónde":"qué"});
+  parts.push({t:v[t],g:esV,r:"verbo"});
+  return {ko:parts.map(p=>p.t).join(" ")+".", es:capF(esTxt.trim())+".", en:capF(enTxt)+".", parts, tense:t, verb:v};
+}
+const koTable = cols => `<div class="gtable-wrap"><table class="gtable kr"><thead><tr><th>Verbo</th>${cols.map(c=>`<th>${c[1]}</th>`).join("")}<th>Significa</th></tr></thead><tbody>${
+  KV.map(v=>`<tr><td><b>${v.d}</b></td>${cols.map(c=>`<td>${c[0]==="how"?v.how:v[c[0]]}</td>`).join("")}<td class="es">${v.es[0]}</td></tr>`).join("")}</tbody></table></div>`;
+
+// Verbos ingleses: b=base, s=con he/she, p=pasado, irr=irregular, es=[infinitivo, yo, ella, yo pasado, ella pasado]
+const EV = [
+ {b:"work",s:"works",p:"worked",es:["trabajar","trabajo","trabaja","trabajé","trabajó"],objs:[["",""],["at home","en casa"]]},
+ {b:"cook",s:"cooks",p:"cooked",es:["cocinar","cocino","cocina","cociné","cocinó"],objs:[["dinner","la cena"],["pasta","pasta"]]},
+ {b:"watch",s:"watches",p:"watched",es:["ver","veo","ve","vi","vio"],objs:[["TV","la tele"],["a movie","una película"]]},
+ {b:"study",s:"studies",p:"studied",es:["estudiar","estudio","estudia","estudié","estudió"],objs:[["English","inglés"],["Korean","coreano"]]},
+ {b:"play",s:"plays",p:"played",es:["jugar","juego","juega","jugué","jugó"],objs:[["soccer","fútbol"],["video games","videojuegos"]]},
+ {b:"live",s:"lives",p:"lived",es:["vivir","vivo","vive","viví","vivió"],objs:[["in Mexico","en México"],["in Korea","en Corea"]]},
+ {b:"eat",s:"eats",p:"ate",irr:1,es:["comer","como","come","comí","comió"],objs:[["pizza","pizza"],["bread","pan"],["an apple","una manzana"]]},
+ {b:"drink",s:"drinks",p:"drank",irr:1,es:["beber","bebo","bebe","bebí","bebió"],objs:[["coffee","café"],["water","agua"],["tea","té"]]},
+ {b:"go",s:"goes",p:"went",irr:1,es:["ir","voy","va","fui","fue"],objs:[["to school","a la escuela"],["to the park","al parque"],["home","a casa"]]},
+ {b:"read",s:"reads",p:"read",irr:1,es:["leer","leo","lee","leí","leyó"],objs:[["a book","un libro"],["the news","las noticias"]]},
+ {b:"speak",s:"speaks",p:"spoke",irr:1,es:["hablar","hablo","habla","hablé","habló"],objs:[["Spanish","español"],["English","inglés"]]},
+ {b:"buy",s:"buys",p:"bought",irr:1,es:["comprar","compro","compra","compré","compró"],objs:[["flowers","flores"],["a dress","un vestido"]]},
+ {b:"sleep",s:"sleeps",p:"slept",irr:1,es:["dormir","duermo","duerme","dormí","durmió"],objs:[["",""],["a lot","mucho"]]},
+ {b:"have",s:"has",p:"had",irr:1,es:["tener","tengo","tiene","tuve","tuvo"],objs:[["a dog","un perro"],["a class","una clase"]]}
+];
+const ES_PERS = [{en:"I",es:"Yo",k:1},{en:"She",es:"Ella",k:2,t:1},{en:"He",es:"Él",k:2,t:1}];
+const ing = b => b==="have"?"having":b==="live"?"living":b+"ing";
+const sp = (a,b) => [a,b].filter(Boolean).join(" ");
+function enTenseSent(t, mode){
+  const v=pickR(EV), o=pickR(v.objs), S=pickR(ES_PERS);
+  mode = mode || pickR(["pos","pos","neg","q"]);
+  let en, es, parts, verbForm;
+  const subj=S.en, sm=S.en==="I"?"I":S.en.toLowerCase(), esSub=S.es, esPres=v.es[S.k], esPast=v.es[S.k+2], ir = S.k===1?"voy a":"va a";
+  if(t==="pres"){
+    if(mode==="neg"){ verbForm=v.b; en=sp(`${subj} ${S.t?"doesn't":"don't"} ${v.b}`,o[0]); es=sp(`${esSub} no ${esPres}`,o[1]); parts=[[subj,esSub.toLowerCase(),"quién"],[S.t?"doesn't":"don't","no","ayudante"],[v.b,esPres,"verbo"]]; }
+    else if(mode==="q"){ verbForm=v.b; en=sp(`${S.t?"Does":"Do"} ${subj==="I"?"you":subj.toLowerCase()} ${v.b}`,o[0])+"?"; es="¿"+sp(`${subj==="I"?"Tú":esSub} ${subj==="I"?v.es[0]==="ir"?"vas":tuForm(v):esPres}`,o[1])+"?"; parts=[[S.t?"Does":"Do","(pregunta)","ayudante"],[subj==="I"?"you":subj.toLowerCase(),subj==="I"?"tú":esSub.toLowerCase(),"quién"],[v.b,v.es[0],"verbo"]]; }
+    else { verbForm=S.t?v.s:v.b; en=sp(`${subj} ${verbForm}`,o[0]); es=sp(`${esSub} ${esPres}`,o[1]); parts=[[subj,esSub.toLowerCase(),"quién"],[verbForm,esPres,"verbo"]]; }
+  } else if(t==="past"){
+    if(mode==="neg"){ verbForm=v.b; en=sp(`Yesterday ${sm} didn't ${v.b}`,o[0]); es=sp(`Ayer ${esSub.toLowerCase()} no ${esPast}`,o[1]); parts=[["Yesterday","ayer","cuándo"],[sm,esSub.toLowerCase(),"quién"],["didn't","no (pasado)","ayudante"],[v.b,esPast,"verbo"]]; }
+    else if(mode==="q"){ verbForm=v.b; en=sp(`Did ${subj==="I"?"you":subj.toLowerCase()} ${v.b}`,o[0])+" yesterday?"; es="¿"+sp(`${subj==="I"?"Tú":esSub} ${subj==="I"?tuPast(v):esPast}`,o[1])+" ayer?"; parts=[["Did","(pregunta pasado)","ayudante"],[subj==="I"?"you":subj.toLowerCase(),subj==="I"?"tú":esSub.toLowerCase(),"quién"],[v.b,v.es[0],"verbo"]]; }
+    else { verbForm=v.p; en=sp(`Yesterday ${sm} ${v.p}`,o[0]); es=sp(`Ayer ${esSub.toLowerCase()} ${esPast}`,o[1]); parts=[["Yesterday","ayer","cuándo"],[sm,esSub.toLowerCase(),"quién"],[v.p,esPast,"verbo"]]; }
+  } else if(t==="fut"){
+    const going = Math.random()<0.4;
+    if(mode==="neg"){ verbForm=v.b; en=sp(`Tomorrow ${sm} won't ${v.b}`,o[0]); es=sp(`Mañana ${esSub.toLowerCase()} no ${ir} ${v.es[0]}`,o[1]); parts=[["Tomorrow","mañana","cuándo"],[sm,esSub.toLowerCase(),"quién"],["won't","no (futuro)","ayudante"],[v.b,v.es[0],"verbo"]]; }
+    else if(going){ const be=S.t?"is":"am"; verbForm=ing(v.b); en=sp(`Tomorrow ${sm} ${be} going to ${v.b}`,o[0]); es=sp(`Mañana ${esSub.toLowerCase()} ${ir} ${v.es[0]}`,o[1]); parts=[["Tomorrow","mañana","cuándo"],[sm,esSub.toLowerCase(),"quién"],[`${be} going to`,ir,"ayudante"],[v.b,v.es[0],"verbo"]]; verbForm=v.b; }
+    else { verbForm=v.b; en=sp(`Tomorrow ${sm} will ${v.b}`,o[0]); es=sp(`Mañana ${esSub.toLowerCase()} ${ir} ${v.es[0]}`,o[1]); parts=[["Tomorrow","mañana","cuándo"],[sm,esSub.toLowerCase(),"quién"],["will","(futuro)","ayudante"],[v.b,v.es[0],"verbo"]]; }
+  }
+  if(o[0] && parts) parts.push([o[0],o[1],o[0].startsWith("to ")||o[0].startsWith("in ")||o[0]==="home"||o[0]==="at home"?"dónde":"qué"]);
+  if(!/[?]$/.test(en)) en+=".";
+  if(!/[?]$/.test(es)) es+=".";
+  return {en:capF(en), es:capF(es), parts:parts.map(p=>({t:p[0],g:p[1],r:p[2]})), tense:t, verb:v, verbForm, mode};
+}
+function tuForm(v){ const m={trabajar:"trabajas",cocinar:"cocinas",ver:"ves",estudiar:"estudias",jugar:"juegas",vivir:"vives",comer:"comes",beber:"bebes",leer:"lees",hablar:"hablas",comprar:"compras",dormir:"duermes",tener:"tienes"}; return m[v.es[0]]||v.es[2]; }
+function tuPast(v){ const m={trabajar:"trabajaste",cocinar:"cocinaste",ver:"viste",estudiar:"estudiaste",jugar:"jugaste",vivir:"viviste",comer:"comiste",beber:"bebiste",ir:"fuiste",leer:"leíste",hablar:"hablaste",comprar:"compraste",dormir:"dormiste",tener:"tuviste"}; return m[v.es[0]]||v.es[4]; }
+const enTable = () => `<div class="gtable-wrap"><table class="gtable"><thead><tr><th>Verbo</th><th>I / you / we / they</th><th>he / she</th><th>Pasado</th><th>Significa</th></tr></thead><tbody>${
+  EV.map(v=>`<tr><td><b>${v.b}</b></td><td>${v.b}</td><td>${v.s}</td><td>${v.p}${v.irr?' <span class="irr">irregular</span>':""}</td><td class="es">${v.es[0]}</td></tr>`).join("")}</tbody></table></div>`;
+
+const G_KO = [
+ {id:"kg1", gram:1, emoji:"🧩", title:"Cómo se arma una oración", pat:`<b>quién</b> + (cuándo) + <b>qué</b> + <b>verbo</b>`,
+  teach:[`Berenice, esta clase es la más importante. En español decimos "Yo como arroz" (quién + verbo + qué). En coreano el orden es distinto: <b>quién + qué + verbo</b>. El verbo <b>siempre</b> va al final.`,
+         `<b>저는 밥을 먹어요</b> → 저는 (yo) + 밥을 (arroz) + 먹어요 (como). Literal: "Yo arroz como".`,
+         `Las <b>partículas</b> son pegatinas que le dicen a cada palabra qué papel tiene:<br>• <b>는 / 은</b> = de quién hablamos (tema): 저<b>는</b><br>• <b>를 / 을</b> = qué cosa (objeto): 밥<b>을</b>, 커피<b>를</b><br>• <b>에</b> = a dónde o cuándo: 학교<b>에</b> (a la escuela)`,
+         `Truco: si la palabra termina en consonante (tiene letra abajo) usa la versión larga (은, 을). Si termina en vocal, la corta (는, 를).`,
+         `Gracias a las partículas, el coreano entiende la oración aunque cambies el orden. Pero el verbo se queda al final.`],
+  tip:"Orden: quién + cuándo + qué + verbo (al final). 는/은 = quién, 를/을 = qué, 에 = a dónde.",
+  types:["role","role","tiles","mean","role","tiles","blank","role"],
+  gen(){ return koTenseSent("pres"); }},
+ {id:"kg2", gram:1, emoji:"🔧", title:"Conjugar en presente (-아요/-어요/-해요)", pat:`raíz + <i>아요</i> / <i>어요</i> / <i>해요</i>`,
+  teach:[`Los verbos en el diccionario terminan en <b>다</b>: 먹<b>다</b> (comer), 가<b>다</b> (ir). Para usarlos, quitas el 다 y te queda la <b>raíz</b>: 먹, 가.`,
+         `Luego miras la <b>última vocal</b> de la raíz:<br>• Si es <b>ㅏ</b> u <b>ㅗ</b> → agrega <b>아요</b>: 앉 + 아요 = 앉아요<br>• Cualquier otra vocal → agrega <b>어요</b>: 먹 + 어요 = 먹어요<br>• Si termina en <b>하다</b> → siempre <b>해요</b>: 공부하다 → 공부해요`,
+         `Cuando la raíz termina en vocal, las vocales se juntan: 가 + 아요 = <b>가요</b>, 보 + 아요 = <b>봐요</b>, 마시 + 어요 = <b>마셔요</b>.`,
+         `¡Buena noticia! El verbo es <b>igual para todas las personas</b>: yo como, tú comes, ella come… todo es <b>먹어요</b>. No hay que memorizar 6 formas como en español.`],
+  tip:"Quita 다. Vocal ㅏ/ㅗ → 아요. Otra vocal → 어요. 하다 → 해요.",
+  table:()=>koTable([["st","Raíz"],["how","Regla"],["pres","Presente"]]),
+  types:["conj","conj","mean","conj","tiles","conj","blank","conj"],
+  gen(){ return koTenseSent("pres"); }},
+ {id:"kg3", gram:1, emoji:"⏪", title:"Pasado (-았어요/-었어요/-했어요)", pat:`raíz + <i>았어요</i> / <i>었어요</i> / <i>했어요</i>`,
+  teach:[`Para hablar del pasado usas la <b>misma regla de vocales</b> del presente, pero agregas <b>ㅆ</b>:<br>• ㅏ / ㅗ → <b>았어요</b><br>• otra vocal → <b>었어요</b><br>• 하다 → <b>했어요</b>`,
+         `Ejemplos: 먹다 → <b>먹었어요</b> (comí), 가다 → <b>갔어요</b> (fui), 보다 → <b>봤어요</b> (vi), 공부하다 → <b>공부했어요</b> (estudié).`,
+         `Truco fácil: toma el presente y cambia <b>요</b> por <b>ㅆ어요</b>: 가요 → 갔어요, 마셔요 → 마셨어요, 해요 → 했어요.`,
+         `Palabras de tiempo útiles: <b>어제</b> = ayer. <b>어제 영화를 봤어요</b> = Ayer vi una película.`],
+  tip:"Presente → pasado: 요 se vuelve ㅆ어요 (가요 → 갔어요, 해요 → 했어요).",
+  table:()=>koTable([["pres","Presente"],["past","Pasado"]]),
+  types:["conj","mean","conj","tiles","conj","listen","conj","tense"],
+  gen(){ return koTenseSent(Math.random()<0.75?"past":"pres"); }},
+ {id:"kg4", gram:1, emoji:"⏩", title:"Futuro (-(으)ㄹ 거예요)", pat:`raíz + <i>ㄹ 거예요</i> / <i>을 거예요</i>`,
+  teach:[`Para el futuro ("voy a…") agregas <b>거예요</b> con este truco:`,
+         `• Raíz termina en <b>vocal</b> → pega <b>ㄹ</b> abajo y luego 거예요: 가 → <b>갈 거예요</b> (voy a ir), 보 → <b>볼 거예요</b>, 공부하 → <b>공부할 거예요</b><br>• Raíz termina en <b>consonante</b> → <b>을 거예요</b>: 먹 → <b>먹을 거예요</b> (voy a comer), 읽 → <b>읽을 거예요</b>`,
+         `Palabra de tiempo: <b>내일</b> = mañana. <b>내일 친구를 만날 거예요</b> = Mañana voy a ver a una amiga.`],
+  tip:"Vocal → ㄹ 거예요 (갈 거예요). Consonante → 을 거예요 (먹을 거예요).",
+  table:()=>koTable([["pres","Presente"],["fut","Futuro"]]),
+  types:["conj","mean","conj","tiles","conj","tense","conj","blank"],
+  gen(){ return koTenseSent(Math.random()<0.75?"fut":"past"); }},
+ {id:"kg5", gram:1, emoji:"🎩", title:"Formal (-습니다/-ㅂ니다)", pat:`raíz + <i>습니다</i> / <i>ㅂ니다</i>`,
+  teach:[`El coreano tiene niveles de respeto. Hasta ahora usaste <b>-요</b>: es educado y sirve para casi todo.`,
+         `En las noticias, en el trabajo o al hablar con un jefe se usa la forma <b>formal</b>:<br>• Raíz con <b>consonante</b> → <b>습니다</b>: 먹 → <b>먹습니다</b><br>• Raíz con <b>vocal</b> → pega <b>ㅂ</b> abajo + 니다: 가 → <b>갑니다</b>, 공부하 → <b>공부합니다</b>`,
+         `Seguro ya la conoces: <b>감사합니다</b> (gracias) y <b>안녕하십니까</b> son formales.`,
+         `Los tres niveles: 먹어 (con amigos íntimos) · <b>먹어요</b> (educado, el que más usarás) · <b>먹습니다</b> (muy formal).`],
+  tip:"Consonante → 습니다 (먹습니다). Vocal → ㅂ니다 (갑니다).",
+  table:()=>koTable([["pres","Educado (-요)"],["form","Formal"]]),
+  types:["conj","conj","mean","tense","conj","tiles","conj","conj"],
+  gen(){ return koTenseSent(Math.random()<0.7?"form":"pres"); }},
+ {id:"kg6", gram:1, emoji:"🔄", title:"Repaso: presente, pasado y futuro", pat:`어제 <b>갔어요</b> · 오늘 <b>가요</b> · 내일 <b>갈 거예요</b>`,
+  teach:[`¡Ya conoces los tiempos! Repasemos con 가다 (ir):`,
+         `• <b>가요</b> = voy (presente)<br>• <b>갔어요</b> = fui (pasado)<br>• <b>갈 거예요</b> = voy a ir (futuro)<br>• <b>갑니다</b> = voy (formal)`,
+         `Fíjate en las palabras de tiempo: <b>어제</b> (ayer) va con pasado, <b>내일</b> (mañana) con futuro, <b>매일</b> (todos los días) con presente.`],
+  tip:"어제 → 았/었어요. 내일 → ㄹ/을 거예요. 매일 → 아요/어요.",
+  table:()=>koTable([["pres","Presente"],["past","Pasado"],["fut","Futuro"],["form","Formal"]]),
+  types:["tense","conj","tense","tiles","conj","mean","tense","conj"],
+  gen(){ return koTenseSent(pickR(["pres","past","fut","form"])); }}
+];
+const G_EN = [
+ {id:"eg1", gram:1, emoji:"🧩", title:"Cómo se arma una oración en inglés", pat:`<b>quién</b> + <b>verbo</b> + <b>qué / dónde</b> + (cuándo)`,
+  teach:[`¡Buena noticia, Berenice! El orden del inglés es casi igual al español: <b>quién + verbo + qué</b>. <b>I eat pizza</b> = Yo como pizza.`,
+         `Pero hay 3 diferencias importantes:<br>1. <b>Siempre</b> dices quién: en español "Como pizza", en inglés <b>I eat pizza</b> (nunca "Eat pizza").<br>2. El adjetivo va <b>antes</b>: a <b>red</b> car (un carro rojo).<br>3. Para negar y preguntar usas un <b>ayudante</b>: don't, doesn't, didn't, will…`,
+         `La palabra de tiempo puede ir al inicio o al final: <b>Yesterday</b> I ate pizza = I ate pizza <b>yesterday</b>.`],
+  tip:"Quién + verbo + qué. En inglés siempre se dice quién.",
+  types:["role","role","tiles","mean","role","tiles","write","role"],
+  gen(){ return enTenseSent("pres","pos"); }},
+ {id:"eg2", gram:1, emoji:"🪞", title:"Verbo to be: afirmar, negar, preguntar", pat:`I <b>am</b> / I'm <b>not</b> / <b>Am</b> I…?`,
+  teach:[`<b>to be</b> significa ser o estar. Se conjuga así:<br>• I <b>am</b> · you / we / they <b>are</b> · he / she / it <b>is</b>`,
+         `<b>Negar:</b> agrega <b>not</b> después: I am <b>not</b> tired. She is <b>not</b> (isn't) busy. They are <b>not</b> (aren't) here.`,
+         `<b>Preguntar:</b> pon el verbo <b>al inicio</b>: <b>Are</b> you happy? <b>Is</b> she ready? Respuestas: Yes, I am. / No, she isn't.`,
+         `Formas cortas que oirás mucho: I'm, you're, she's, isn't, aren't.`],
+  tip:"am / is / are. Negar: + not. Preguntar: el verbo va primero (Are you…?).",
+  types:["blank","mean","blank","tiles","write","blank","listen","write"],
+  gen(){ const S=pickR(SUBJ); const a=pickR([["happy","feliz","feliz","felices"],["tired","cansado","cansada","cansados"],["busy","ocupado","ocupada","ocupados"],["at home","en casa","en casa","en casa"],["ready","listo","lista","listos"],["hungry","con hambre","con hambre","con hambre"]]);
+    const fem=S.i===0||S.i===2; const adj=S.i>=4?a[3]:(fem?a[2]:a[1]); const be=BE[S.i]; const m=pickR(["pos","neg","q"]);
+    if(m==="neg"){ const nb = be==="am"?"am not":be==="is"?"isn't":"aren't"; return {en:`${S.en} ${nb} ${a[0]}.`, es:`${S.es} no ${ESTAR[S.i]} ${adj}.`, parts:[{t:S.en,g:S.es.toLowerCase(),r:"quién"},{t:nb,g:"no "+ESTAR[S.i],r:"verbo"},{t:a[0],g:adj,r:"qué"}]}; }
+    if(m==="q"){ const su=S.i===0?"you":S.en.toLowerCase(), b2=S.i===0?"are":be; return {en:`${capF(b2)} ${su} ${a[0]}?`, es:`¿${S.i===0?"Estás":capF(ESTAR[S.i])} ${S.i===0?(a[1]):adj}?`, parts:[{t:capF(b2),g:"(pregunta)",r:"verbo"},{t:su,g:"",r:"quién"},{t:a[0],g:adj,r:"qué"}]}; }
+    return {en:`${S.en} ${be} ${a[0]}.`, es:`${S.es} ${ESTAR[S.i]} ${adj}.`, parts:[{t:S.en,g:S.es.toLowerCase(),r:"quién"},{t:be,g:ESTAR[S.i],r:"verbo"},{t:a[0],g:adj,r:"qué"}]}; }},
+ {id:"eg3", gram:1, emoji:"🔧", title:"Presente simple: la regla de la -s", pat:`I work · She work<b>s</b> · She <b>doesn't</b> work · <b>Does</b> she work?`,
+  teach:[`En inglés el verbo casi no cambia. ¡Solo hay que recordar una regla! Con <b>he / she / it</b> se agrega <b>-s</b>: I work → she work<b>s</b>.`,
+         `Cómo agregar la -s:<br>• Normal: + <b>s</b> (works, eats, reads)<br>• Termina en -ch, -sh, -o: + <b>es</b> (watches, goes)<br>• Termina en consonante + y: y → <b>ies</b> (study → studies)<br>• Especial: have → <b>has</b>`,
+         `<b>Negar:</b> don't / doesn't + verbo <b>sin -s</b>: She <b>doesn't work</b> (no "doesn't works").`,
+         `<b>Preguntar:</b> Do / Does al inicio + verbo sin -s: <b>Does</b> she <b>work</b>? <b>Do</b> you <b>work</b>?`],
+  tip:"He / She → verbo + s. Pero con doesn't / does el verbo va sin -s.",
+  table:enTable,
+  types:["conj","conj","mean","conj","tiles","write","conj","blank"],
+  gen(){ return enTenseSent("pres"); }},
+ {id:"eg4", gram:1, emoji:"⏪", title:"Pasado: -ed y verbos irregulares", pat:`I work<b>ed</b> · I <b>ate</b> · I <b>didn't</b> eat · <b>Did</b> you eat?`,
+  teach:[`Para el pasado, la mayoría de los verbos solo agrega <b>-ed</b>: work → work<b>ed</b>, cook → cook<b>ed</b>, play → play<b>ed</b>, study → stud<b>ied</b>.`,
+         `Algunos verbos muy usados son <b>irregulares</b> y hay que aprenderlos: eat → <b>ate</b>, go → <b>went</b>, drink → <b>drank</b>, have → <b>had</b>, buy → <b>bought</b>. Están en la tabla de abajo.`,
+         `¡Lo mejor! En pasado el verbo es <b>igual para todos</b>: I ate, she ate, they ate. Sin -s.`,
+         `<b>Negar:</b> didn't + verbo normal: I <b>didn't eat</b>. <b>Preguntar:</b> <b>Did</b> you <b>eat</b>? (el verbo regresa a su forma normal).`],
+  tip:"Regulares + ed. Irregulares: ate, went, drank, had… Con didn't / did el verbo va normal.",
+  table:enTable,
+  types:["conj","mean","conj","tiles","conj","write","tense","conj"],
+  gen(){ return enTenseSent(Math.random()<0.8?"past":"pres"); }},
+ {id:"eg5", gram:1, emoji:"⏩", title:"Futuro: will y going to", pat:`I <b>will</b> study · I'm <b>going to</b> study · I <b>won't</b> study`,
+  teach:[`Para el futuro hay dos formas fáciles:<br>• <b>will</b> + verbo: I <b>will</b> study (estudiaré)<br>• <b>am / is / are going to</b> + verbo: I am <b>going to</b> study (voy a estudiar)`,
+         `<b>will</b> no cambia nunca: I will, she will, they will. El verbo va normal, sin -s.`,
+         `<b>Negar:</b> won't (= will not): She <b>won't</b> work tomorrow.`,
+         `"going to" se parece mucho al español "voy a": I'm going to eat = Voy a comer.`],
+  tip:"will + verbo normal. going to = voy a. won't = no + futuro.",
+  types:["conj","mean","tiles","conj","write","tense","conj","blank"],
+  gen(){ return enTenseSent(Math.random()<0.8?"fut":"past"); }},
+ {id:"eg6", gram:1, emoji:"🔄", title:"Repaso: presente, pasado y futuro", pat:`I <b>eat</b> · I <b>ate</b> · I <b>will eat</b>`,
+  teach:[`Repasemos los tres tiempos con <b>eat</b> (comer):`,
+         `• Presente: I <b>eat</b> / she <b>eats</b> (como / come)<br>• Pasado: I <b>ate</b> / she <b>ate</b> (comí / comió)<br>• Futuro: I <b>will eat</b> / she <b>will eat</b> (comeré / comerá)`,
+         `Ayudantes para negar: <b>don't / doesn't</b> (presente), <b>didn't</b> (pasado), <b>won't</b> (futuro). Después de todos ellos, el verbo va normal.`],
+  tip:"Presente: eat/eats. Pasado: ate. Futuro: will eat. Ayudante + verbo normal.",
+  table:enTable,
+  types:["tense","conj","tense","tiles","write","conj","tense","mean"],
+  gen(){ return enTenseSent(pickR(["pres","past","fut"])); }}
+];
+function insertAfter(list, afterId, items){ const i=list.findIndex(c=>c.id===afterId); list.splice(i+1,0,...items); }
+insertAfter(CLASSES.ko,"k2",[G_KO[0]]); insertAfter(CLASSES.ko,"k4",[G_KO[1]]); insertAfter(CLASSES.ko,"k10",G_KO.slice(2));
+insertAfter(CLASSES.en,"e1",G_EN.slice(0,2)); insertAfter(CLASSES.en,"e5",[G_EN[2]]); insertAfter(CLASSES.en,"e9",G_EN.slice(3,5)); CLASSES.en.push(G_EN[5]);
+const ROLE_ES = {"quién":"QUIÉN hace la acción","qué":"QUÉ cosa (el objeto)","verbo":"el VERBO (la acción)","cuándo":"CUÁNDO pasa","dónde":"A DÓNDE / DÓNDE","ayudante":"el AYUDANTE (don't, did, will…)"};
+const TENSE_ES = {pres:"Presente", past:"Pasado", fut:"Futuro", form:"Formal"};
+
 // Grupos para opciones de "completa"
 const EN_GROUPS=[["am","is","are"],["a","an"],["have","has"],["do","does"],["Do","Does"],["don't","doesn't"],["like","likes"],["can","can't"],["This","That"],["here","there"]];
 VB.forEach(v=>{ const a=v.en.split(" ")[0], b=v.en3.split(" ")[0]; EN_GROUPS.push([a,b,v.ing.split(" ")[0]]); });
@@ -1324,8 +1574,8 @@ function renderClassList(){
   const next=list.findIndex(c=>!done[c.id]);
   list.forEach((c,i)=>{ const d=document.createElement("button"); d.className="cl-card"+(i===next?" now":"");
     const st=done[c.id]||0;
-    d.innerHTML=`<span class="cl-emoji">${c.emoji}</span><span class="cl-t"><b>Clase ${i+1}</b><span></span></span><span class="cl-stars">${"★".repeat(st)}${"☆".repeat(3-st)}</span>`;
-    d.querySelector(".cl-t span").textContent=c.title; d.onclick=()=>openClass(c.id); box.appendChild(d); });
+    d.innerHTML=`<span class="cl-emoji">${c.emoji}</span><span class="cl-t"><b>Clase ${i+1}${c.gram?' · <span class="gram-tag">📘 Gramática</span>':""}</b><span></span></span><span class="cl-stars">${"★".repeat(st)}${"☆".repeat(3-st)}</span>`;
+    d.querySelector(".cl-t > span").textContent=c.title; d.onclick=()=>openClass(c.id); box.appendChild(d); });
   $("#clIntro").textContent = CL.track==="ko" ? "Clases de coreano: la maestra te explica, ves ejemplos y practicas armando oraciones." : "Clases de inglés: la maestra te explica en español, ves ejemplos y practicas escribiendo oraciones.";
 }
 function teacher(html){ return `<div class="teacher"><div class="t-av" aria-hidden="true">👩‍🏫</div><div class="t-bubble">${html}</div></div>`; }
@@ -1341,16 +1591,20 @@ function openClass(id){
 function sentRow(s){
   const d=document.createElement("div"); d.className="ex-sent";
   const main = CL.track==="ko" ? `<div class="s-main kr"></div><div class="s-rom"></div>` : `<div class="s-main"></div>`;
-  d.innerHTML=`<div class="s-text">${main}<div class="s-es"></div></div><div class="s-btns"><button class="btn" aria-label="Escuchar">🔊</button><button class="btn" aria-label="Escuchar lento">🐢</button></div>`;
+  d.innerHTML=`<div class="s-text">${main}<div class="s-es"></div></div><div class="s-btns"><button class="btn" aria-label="Escuchar">🔊</button><button class="btn" aria-label="Escuchar lento">🐢</button><button class="btn" aria-label="Palabra por palabra">🐌</button></div>`;
   d.querySelector(".s-main").textContent=tgt(s); if(CL.track==="ko") d.querySelector(".s-rom").textContent=romOf(s.ko.replace(/[.?!]/g,""));
   d.querySelector(".s-es").textContent = s.es + (CL.track==="ko"&&s.en?`  ·  ${s.en}`:"");
-  const [b1,b2]=d.querySelectorAll("button"); b1.onclick=()=>sayT(s); b2.onclick=()=>sayT(s,true);
+  const [b1,b2,b3]=d.querySelectorAll("button"); b1.onclick=()=>sayT(s); b2.onclick=()=>sayT(s,true);
+  const mainEl=d.querySelector(".s-main");
+  b3.onclick=()=>{ const words=tgt(s).split(" "); speakWords(tgt(s),CL.track,i=>{ mainEl.innerHTML = i<0 ? esc(tgt(s)) : words.map((w,k)=>k===i?`<mark>${esc(w)}</mark>`:esc(w)).join(" "); }); };
+  if(s.parts){ const wrap=document.createElement("div"); wrap.className="s-build"; wrap.innerHTML=partsHtml(s.parts); d.querySelector(".s-text").appendChild(wrap); }
   return d;
 }
 function renderStep(){
   clHeader(); const c=CL.cur, body=$("#clBody"); body.innerHTML="";
   if(CL.step===0){
     body.insertAdjacentHTML("beforeend", teacher(c.teach.map(p=>`<p>${p}</p>`).join("")));
+    if(c.table) body.insertAdjacentHTML("beforeend", `<div class="gbox"><span class="hint">Tabla de conjugación (desliza si no cabe)</span>${c.table()}</div>`);
     body.insertAdjacentHTML("beforeend", `<div class="pattern"><span class="hint">La fórmula</span><div class="${CL.track==="ko"?"kr":""}">${c.pat}</div></div>`);
     body.insertAdjacentHTML("beforeend", `<div class="row" style="justify-content:flex-end"><button class="btn primary" id="clGo1">Ver ejemplos →</button></div>`);
     $("#clGo1").onclick=()=>{ CL.step=1; CL.sents=genSents(c,5); renderStep(); };
@@ -1365,7 +1619,7 @@ function renderStep(){
 }
 function startPractice(){
   const c=CL.cur; const sents=genSents(c,8);
-  const types = CL.track==="ko" ? ["mean","tiles","blank","listen","tiles","mean","blank","tiles"] : ["mean","tiles","blank","write","listen","tiles","blank","write"];
+  const types = c.types ? c.types : CL.track==="ko" ? ["mean","tiles","blank","listen","tiles","mean","blank","tiles"] : ["mean","tiles","blank","write","listen","tiles","blank","write"];
   CL.ex=sents.map((s,i)=>({type:types[i%types.length], s}));
   CL.pool=genSents(c,14); CL.k=0; CL.right=0; CL.step=2; renderStep();
 }
@@ -1373,12 +1627,17 @@ const RIGHT=["¡Muy bien, Berenice! 👏","¡Excelente! ⭐","¡Eso es! Vas geni
 function exFeedback(ok, correctHtml){
   const fb=$("#exFb"); fb.className="status "+(ok?"done":"bad");
   fb.innerHTML = ok ? pickR(RIGHT) : `Casi. La respuesta es: <b>${correctHtml}</b><br><span class="hint">Recuerda: ${CL.cur.tip}</span>`;
+  const sx=CL.ex[CL.k].s; if(sx.parts) fb.innerHTML+=`<div class="s-build" style="justify-content:center;margin-top:8px">${partsHtml(sx.parts)}</div>`;
   CL.answered=true; if(ok) CL.right++; bump();
   $("#exNext").hidden=false; $("#exNext").focus({preventScroll:true});
   sayT(CL.ex[CL.k].s);
 }
 const esc = s => s.replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 function otherSents(s,n,key){ return shuffle(CL.pool.filter(x=>key(x)!==key(s))).filter((x,i,a)=>a.findIndex(y=>key(y)===key(x))===i).slice(0,n); }
+function partsHtml(parts){
+  const cls={"quién":"r1","qué":"r2","verbo":"r3","cuándo":"r4","dónde":"r5","ayudante":"r6"};
+  return parts.map(p=>`<span class="pchip ${cls[p.r]||""}"><b class="${CL.track==="ko"?"kr":""}">${esc(p.t)}</b>${p.g?`<i>${esc(p.g)}</i>`:""}<small>${esc(p.r)}</small></span>`).join("");
+}
 function renderEx(){
   const body=$("#clBody"); const e=CL.ex[CL.k], s=e.s; CL.answered=false;
   const isKo=CL.track==="ko";
@@ -1400,8 +1659,8 @@ function renderEx(){
       A.appendChild(b); });
   } else if(e.type==="listen"){
     ask.textContent = isKo ? "Escucha y elige la oración que oíste." : "Escucha y escribe lo que oíste en inglés.";
-    q.innerHTML=`<div class="row" style="justify-content:center"><button class="btn primary" id="exPlay">🔊 Escuchar</button><button class="btn" id="exSlow">🐢 Lento</button></div>`;
-    $("#exPlay").onclick=()=>sayT(s); $("#exSlow").onclick=()=>sayT(s,true); setTimeout(()=>sayT(s),300);
+    q.innerHTML=`<div class="row" style="justify-content:center"><button class="btn primary" id="exPlay">🔊 Escuchar</button><button class="btn" id="exSlow">🐢 Lento</button><button class="btn" id="exWords">🐌 Palabra por palabra</button></div>`;
+    $("#exPlay").onclick=()=>sayT(s); $("#exSlow").onclick=()=>sayT(s,true); $("#exWords").onclick=()=>speakWords(tgt(s),CL.track); setTimeout(()=>sayT(s),300);
     if(isKo){
       const opts=shuffle([s,...otherSents(s,3,x=>x.ko)]); A.className="opts";
       opts.forEach(o=>{ const b=document.createElement("button"); b.className="kr"; b.style.fontSize="19px"; b.textContent=o.ko;
@@ -1431,6 +1690,48 @@ function renderEx(){
     $("#tClr").onclick=()=>{ if(CL.answered) return; picked.length=0; draw(); };
     $("#tChk").onclick=()=>{ if(CL.answered||!picked.length) return; const got=picked.map(p=>tokNorm(p.t)).join(" "); const ok=got===clean.map(tokNorm).join(" ");
       exFeedback(ok, esc(tgt(s))); $("#tAns").classList.add(ok?"ok":"no"); };
+  } else if(e.type==="conj"){
+    if(isKo){
+      const v=s.verb, t=s.tense;
+      ask.innerHTML=`Conjuga <b class="kr">${v.d}</b> (${esc(v.es[0])}) en <b>${KT[t].toLowerCase()}</b>:`;
+      q.innerHTML=`<div class="s-main kr"></div><div class="s-es"></div>`;
+      q.querySelector(".s-main").innerHTML=s.parts.map(p=>p.r==="verbo"?`<span class="blank">____</span>`:esc(p.t)).join(" ")+".";
+      q.querySelector(".s-es").textContent=s.es;
+      const opts=shuffle([v[t],...shuffle(koWrong(v,t)).slice(0,3)]);
+      A.className="opts"; opts.forEach(o=>{ const b=document.createElement("button"); b.className="kr"; b.style.fontSize="19px"; b.textContent=o;
+        b.onclick=()=>{ if(CL.answered) return; const ok=o===v[t]; b.classList.add(ok?"right":"wrong"); [...A.children].forEach((c,i)=>{ if(opts[i]===v[t]) c.classList.add("right"); });
+          q.querySelector(".blank").textContent=v[t]; exFeedback(ok, `${esc(v[t])} <span class="hint">(${v.d}: ${v.how.replace(/<[^>]+>/g,"")})</span>`); };
+        A.appendChild(b); });
+    } else {
+      const v=s.verb; const words=s.en.split(" "); const vi=words.findIndex((w,i)=>i>0 && w.replace(/[.?]$/,"")===s.verbForm);
+      const idx = vi<0 ? words.length-1 : vi; const punct=(words[idx].match(/[.?]$/)||[""])[0];
+      ask.innerHTML=`Elige la forma correcta del verbo <b>${esc(v.b)}</b> (${esc(v.es[0])}):`;
+      q.innerHTML=`<div class="s-main"></div><div class="s-es"></div>`;
+      q.querySelector(".s-main").innerHTML=words.map((w,i)=>i===idx?`<span class="blank">____</span>${punct}`:esc(w)).join(" ");
+      q.querySelector(".s-es").textContent=s.es;
+      const forms=[...new Set([v.b,v.s,v.p,ing(v.b)])]; const ans=s.verbForm;
+      const opts=shuffle([ans,...shuffle(forms.filter(f=>f!==ans)).slice(0,3)]);
+      A.className="opts"; opts.forEach(o=>{ const b=document.createElement("button"); b.textContent=o;
+        b.onclick=()=>{ if(CL.answered) return; const ok=o===ans; b.classList.add(ok?"right":"wrong"); [...A.children].forEach((c,i)=>{ if(opts[i]===ans) c.classList.add("right"); });
+          q.querySelector(".blank").textContent=ans; exFeedback(ok, esc(s.en)); };
+        A.appendChild(b); });
+    }
+  } else if(e.type==="tense"){
+    ask.textContent="¿En qué tiempo está esta oración?";
+    q.innerHTML=`<div class="s-main ${isKo?"kr":""}"></div><div class="s-es"></div><button class="btn" id="exPlay">🔊 Escuchar</button>`;
+    q.querySelector(".s-main").textContent=tgt(s); q.querySelector(".s-es").textContent=s.es; $("#exPlay").onclick=()=>sayT(s);
+    const all = isKo ? ["pres","past","fut","form"] : ["pres","past","fut"];
+    A.className="opts"; all.forEach(k=>{ const b=document.createElement("button"); b.textContent=TENSE_ES[k];
+      b.onclick=()=>{ if(CL.answered) return; const ok=k===s.tense; b.classList.add(ok?"right":"wrong"); [...A.children].forEach((c,i)=>{ if(all[i]===s.tense) c.classList.add("right"); }); exFeedback(ok, TENSE_ES[s.tense]); };
+      A.appendChild(b); });
+  } else if(e.type==="role"){
+    const roles=[...new Set(s.parts.map(p=>p.r))]; const role=pickR(roles);
+    ask.innerHTML=`Toca la palabra que es <b>${ROLE_ES[role]}</b>:`;
+    q.innerHTML=`<div class="s-es"></div><button class="btn" id="exPlay">🔊 Escuchar</button>`; q.querySelector(".s-es").textContent=s.es; $("#exPlay").onclick=()=>sayT(s);
+    A.className="tiles-pool"; s.parts.forEach(p=>{ const b=document.createElement("button"); b.className="tile"+(isKo?" kr":""); b.innerHTML=`<span></span>${isKo?`<small>${esc(romOf(p.t))}</small>`:""}`; b.firstChild.textContent=p.t;
+      b.onclick=()=>{ if(CL.answered) return; const ok=p.r===role; b.classList.add(ok?"ok":"no"); [...A.children].forEach((c,i)=>{ if(s.parts[i].r===role) c.classList.add("ok"); });
+        exFeedback(ok, esc(s.parts.filter(x=>x.r===role).map(x=>x.t).join(" "))); };
+      A.appendChild(b); });
   } else if(e.type==="blank"){
     const toks=tgt(s).split(" ");
     let idxs=toks.map((t,i)=>i).filter(i=>(isKo?koVariants(toks[i]):enVariants(toks[i])).length);
@@ -1571,6 +1872,7 @@ function renderSay(){
 const curSay=()=>{ const list=sayList(); return list[sayIdx%list.length]; };
 $("#sayListen").onclick=()=>{ const w=curSay(); speak(sayLang==="ko"?w.ko:w.en,sayLang,false); };
 $("#saySlow").onclick=()=>{ const w=curSay(); speak(sayLang==="ko"?w.ko:w.en,sayLang,true); };
+$("#sayWords").onclick=()=>{ const w=curSay(); speakWords(sayLang==="ko"?w.ko:w.en,sayLang); };
 $("#sayNext").onclick=()=>{ sayIdx=Math.floor(Math.random()*sayList().length); renderSay(); };
 document.querySelectorAll("[data-lang]").forEach(b=>b.onclick=()=>{ sayLang=b.dataset.lang; document.querySelectorAll("[data-lang]").forEach(x=>x.setAttribute("aria-pressed",String(x===b))); sayIdx=0; renderSay(); });
 function similarity(a,b){
