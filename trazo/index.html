@@ -1406,7 +1406,7 @@ function renderPanel(){
     deleteSheet(b.dataset.delsheet);
   });
   const ac=$("#addSheet"); if(ac) ac.onclick=()=>$("#fileIn").click();
-  const ad=$("#addDir"); if(ad) ad.onclick=()=>{ const v=$("#upFolder"); if(v) S.upFolder=v.value.trim(); $("#dirIn").click(); };
+  const ad=$("#addDir"); if(ad) ad.onclick=()=>{ const v=$("#upFolder"); if(v) S.upFolder=v.value.trim(); pickDir(); };
   const az=$("#addZip"); if(az) az.onclick=()=>{ const v=$("#upFolder"); if(v) S.upFolder=v.value.trim(); $("#fileIn").click(); };
   pb.querySelectorAll("[data-folder]").forEach(i=>i.onchange=()=>{ const s=S.sheets.find(x=>x.id===i.dataset.folder); s.folder=i.value.trim(); persist(); renderSheetSel(); renderPanel(); });
   const uf=$("#upFolder"); if(uf) uf.onchange=()=>{ S.upFolder=uf.value.trim(); };
@@ -1697,7 +1697,7 @@ function bindFiles(keys){
   const up=(inp)=>{ S.upFolder=S.fcur; $(inp).click(); };
   const on=(id,fn)=>{ const el=$(id); if(el) el.onclick=fn; };
   on("#fDrive",()=>driveModal());
-  on("#fUp",()=>up("#fileIn")); on("#fUpZip",()=>up("#fileIn")); on("#fUpDir",()=>up("#dirIn"));
+  on("#fUp",()=>up("#fileIn")); on("#fUpZip",()=>up("#fileIn")); on("#fUpDir",()=>{ S.upFolder=S.fcur; pickDir(); });
   on("#fNew",()=>{ fEdit={mode:"new"}; renderFiles(); setTimeout(()=>{ const i=$("#fNewName"); if(i) i.focus(); },20); });
   on("#fNewTop",()=>{ S.fcur=""; fEdit={mode:"new"}; renderFiles(); setTimeout(()=>{ const i=$("#fNewName"); if(i) i.focus(); },20); });
   const mk=()=>{ const v=($("#fNewName").value||"").replace(/\//g,"-").trim(); if(!v){ toast("Escribe el nombre de la carpeta"); return; } const p=S.fcur?S.fcur+SEP+v:v; if(allFolders().includes(p)){ toast("Ya existe una carpeta con ese nombre"); return; } S.folders.push(p); S.fopen.add(S.fcur); fEdit=null; persist(); renderFiles(); toast("Carpeta creada"); };
@@ -2051,7 +2051,24 @@ async function addFiles(files, opts={}){
   } else toast("No se pudo leer ningún plano. ¿Están dañados o protegidos con contraseña?");
 }
 $("#uploadBtn").onclick=()=>{ if(S.view==="files") S.upFolder=S.fcur; $("#fileIn").click(); };
-$("#dirBtn").onclick=()=>{ if(S.view==="files") S.upFolder=S.fcur; $("#dirIn").click(); };
+$("#dirBtn").onclick=()=>{ if(S.view==="files") S.upFolder=S.fcur; pickDir(); };
+/* iPad/iPhone: el selector de carpetas de iOS no entra a Google Drive; ahí se eligen varios PDF o un ZIP */
+const IS_IOS=/iPad|iPhone|iPod/.test(navigator.userAgent)||(navigator.platform==="MacIntel"&&navigator.maxTouchPoints>1);
+function pickDir(){
+  if(!IS_IOS){ $("#dirIn").click(); return; }
+  const host=$("#modalHost");
+  host.innerHTML=`<div class="modal" role="dialog" aria-modal="true" aria-labelledby="pdT"><div class="box" style="max-width:460px"><h3 id="pdT" style="margin:0">Subir una carpeta de planos</h3>
+  <p class="small" style="margin:0">En el iPad, Apple no deja elegir carpetas completas de Google Drive. Tienes dos formas fáciles:</p>
+  <button class="btn primary" id="pdMany" style="justify-content:flex-start">1 · Elegir varios planos a la vez</button>
+  <p class="small muted" style="margin:-4px 0 0">Se abre Archivos → toca <b>Google Drive</b> → entra a la carpeta → <b>Seleccionar</b> (arriba a la derecha) → marca los PDF o toca «Seleccionar todo» → <b>Abrir</b>.</p>
+  <button class="btn" id="pdZip" style="justify-content:flex-start">2 · Subir la carpeta como ZIP</button>
+  <p class="small muted" style="margin:-4px 0 0">Abre drive.google.com en Safari o en la computadora → clic derecho (o mantén presionada) la carpeta → <b>Descargar</b>: Drive arma un .zip → guárdalo en Archivos → aquí eliges ese .zip. Se respetan las subcarpetas.</p>
+  <div class="actions"><button class="btn sm" id="pdClose">Cerrar</button></div></div></div>`;
+  const close=()=>host.innerHTML="";
+  $("#pdMany").onclick=()=>{ close(); $("#fileIn").click(); };
+  $("#pdZip").onclick=()=>{ close(); $("#fileIn").click(); };
+  $("#pdClose").onclick=close;
+}
 $("#dirIn").onchange=e=>{ addFiles(e.target.files); e.target.value=""; };
 $("#fileIn").onchange=e=>{ addFiles(e.target.files); e.target.value=""; };
 let dragN=0;
