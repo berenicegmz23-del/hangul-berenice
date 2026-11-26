@@ -405,6 +405,10 @@ body{font-weight:600}
 .inkbar .wbtn[aria-pressed="true"]{border:2px solid var(--ink);background:var(--pink-2)}
 .inkbar .wbtn i{box-shadow:0 0 0 1px rgba(58,38,34,.25)}
 .inkbar .po{font-weight:700}
+.selbar{position:absolute;z-index:8;display:flex;gap:4px;padding:4px;background:var(--surface);border:2px solid var(--ink);border-radius:999px;box-shadow:2px 3px 0 var(--ink);transform:translateX(-50%)}
+.selbar button{display:flex;align-items:center;gap:5px;border:0;background:none;border-radius:999px;padding:7px 12px;font:700 14px var(--display,inherit);color:var(--ink);min-height:40px;cursor:pointer}
+.selbar button:active{background:var(--pink-2)}
+.selbar button.del{color:#b42318}
 .inkbar .shb{width:38px;height:38px}
 .inkbar.shp{flex-wrap:wrap;border-radius:24px;row-gap:6px;max-width:min(600px,calc(100% - 200px))}
 @media (max-width:860px){ .inkbar.shp{max-width:calc(100% - 16px)} }
@@ -464,6 +468,7 @@ body{font-weight:600}
     </div>
     <div class="hint" id="hint" hidden></div>
     <div class="inkbar" id="inkbar" hidden></div>
+    <div class="selbar" id="selbar" hidden><button id="sbCopy" aria-label="Copiar"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="8" y="8" width="12" height="12" rx="2.5" fill="#fff59a"/><path d="M16 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2"/></svg>Copiar</button><button id="sbDel" class="del" aria-label="Borrar"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h16M9 7V4.5h6V7M6 7l1 13h10l1-13" fill="#fbd3e0"/><path d="M10 11v6M14 11v6"/></svg>Borrar</button></div>
     <button class="paneltg" id="panelTg" aria-pressed="false" title="Mostrar u ocultar cuantificación, notas y material"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M15 4v16"/></svg><span>Cuantificación</span></button>
     <div class="sharp" id="sharpPill" hidden><i></i>Afinando plano…</div>
     <div class="tip" id="tip" hidden></div>
@@ -704,7 +709,7 @@ function setTool(id, keepPreset){
   finishDrawing(true);
   if(!keepPreset) S.preset=null;
   S.calib=null;
-  S.tool=id;
+  S.tool=id; S.selQuiet=false;
   if(id.startsWith("pin-")) S.pinKind=id.slice(4);
   document.querySelectorAll(".tool").forEach(b=>b.setAttribute("aria-pressed", b.id==="tool-"+id));
   const st=$("#stage"); st.classList.toggle("pan", id==="pan"); st.classList.toggle("draw", id!=="pan"&&id!=="select");
@@ -839,6 +844,7 @@ function applyView(){
   if(hiView){ const s=S.z/hiView.z; $("#hiCv").style.transform=`translate(${S.tx-hiView.tx*s}px,${S.ty-hiView.ty*s}px) scale(${s})`; }
   if(S.matView&&S.pedido&&S.matriz.length&&!stampRAF) stampRAF=requestAnimationFrame(()=>{ stampRAF=0; renderSVG(); });
   $("#zoomLbl").textContent=Math.round(S.z*100)+"%";
+  posSelBar();
 }
 function fit(){
   autoFit=true;
@@ -1064,6 +1070,7 @@ function renderSVG(){
   out+=`<g id="liveInk"></g>`;
   if(hv && S.snapped) out+=`<rect x="${hv[0]-6/z}" y="${hv[1]-6/z}" width="${12/z}" height="${12/z}" fill="none" stroke="#0e9384" stroke-width="${2/z}"/>`;
   svg.innerHTML=out;
+  posSelBar();
 }
 
 /* ============ medición en vivo (tooltip) ============ */
@@ -1096,7 +1103,7 @@ function snapPoint(p, e){
 const stage=$("#stage");
 stage.addEventListener("pointerdown", e=>{
   if(!curSheet()) return;
-  if(e.target.closest("button,input,select,textarea,label,a,.hud,.inkbar,.banner,.cmplegend")) return; // controles sobre el plano
+  if(e.target.closest("button,input,select,textarea,label,a,.hud,.inkbar,.selbar,.banner,.cmplegend")) return; // controles sobre el plano
   if(e.pointerType==="pen"&&!S.penSeen){ S.penSeen=true; S.penOnly=true; inkBar(); }
   // con Apple Pencil en modo selección: escribe, no selecciona ni mueve (seleccionar es con el dedo)
   if(e.pointerType==="pen"&&(S.tool==="select"||S.tool==="pan")&&!(S.tool==="select"&&(e.target.closest("[data-h]")||e.target.closest("[data-id]")))) setTool("pen");
@@ -1119,7 +1126,7 @@ stage.addEventListener("pointerdown", e=>{
     const sm=S.markups.find(x=>x.id===S.sel);
     if(hh&&sm&&sm.type==="shape"){ act={mode:"vertex",m:sm,i:+hh.dataset.h,moved:false}; return; }
     const tm=gg&&S.markups.find(x=>x.id===gg.dataset.id);
-    if(tm&&tm.type==="shape"){ S.sel=tm.id; act={mode:"move",m:tm,start:p,orig:JSON.parse(JSON.stringify(tm.pts)),moved:false}; renderSVG(); return; }
+    if(tm&&tm.type==="shape"){ S.sel=tm.id; S.selQuiet=true; act={mode:"move",m:tm,start:p,orig:JSON.parse(JSON.stringify(tm.pts)),moved:false}; renderSVG(); return; }
     S.drawing={type:"shape",kind:S.shapeKind,pts:[p,p],w:S.ink.w*1.3/S.z}; act={mode:"shape",sx:e.clientX,sy:e.clientY,pid:e.pointerId}; renderSVG(); return;
   }
   if(drawingTool && S.penOnly && e.pointerType==="touch"){ act={mode:"pan",sx:e.clientX,sy:e.clientY,tx:S.tx,ty:S.ty,moved:true}; return; }
@@ -1128,7 +1135,7 @@ stage.addEventListener("pointerdown", e=>{
   if(S.tool==="select"){
     const h=e.target.closest("[data-h]"); const g=e.target.closest("[data-id]");
     if(h && S.sel){ const m=S.markups.find(x=>x.id===S.sel); act={mode:"vertex",m,i:+h.dataset.h,moved:false}; return; }
-    if(g){ const m=S.markups.find(x=>x.id===g.dataset.id); if(m){ S.sel=m.id; act={mode:"move",m,start:p,orig:JSON.parse(JSON.stringify(m.pts)),moved:false}; renderSVG(); renderProps(); renderPanel(); return; } }
+    if(g){ const m=S.markups.find(x=>x.id===g.dataset.id); if(m){ S.sel=m.id; S.selQuiet=false; act={mode:"move",m,start:p,orig:JSON.parse(JSON.stringify(m.pts)),moved:false}; renderSVG(); renderProps(); renderPanel(); return; } }
     act={mode:"pan",sx:e.clientX,sy:e.clientY,tx:S.tx,ty:S.ty,moved:false,deselect:true}; return;
   }
   // herramientas de dibujo: clic = punto, arrastre = mover plano
@@ -1173,7 +1180,7 @@ function endPtr(e){
   if(act&&act.mode==="shape"){ if(e.pointerId!==act.pid) return; const d=S.drawing; act=null; S.drawing=null; if(!d||e.type==="pointercancel"){ renderSVG(); return; }
     let [a,b]=d.pts; if(Math.hypot(b[0]-a[0],b[1]-a[1])*S.z<8){ const r=28/S.z; a=[a[0]-r,a[1]-r]; b=[a[0]+2*r,a[1]+2*r]; }
     const rd=q=>[Math.round(q[0]*10)/10,Math.round(q[1]*10)/10];
-    S.markups.push({id:uid(),sheet:S.cur,type:"shape",kind:d.kind,pts:[rd(a),rd(b)],color:S.ink.color,w:Math.round(d.w*100)/100,fill:S.shapeFill&&!OPEN_SHAPES[d.kind],text:""}); S.sel=S.markups[S.markups.length-1].id; commit(); return; }
+    S.markups.push({id:uid(),sheet:S.cur,type:"shape",kind:d.kind,pts:[rd(a),rd(b)],color:S.ink.color,w:Math.round(d.w*100)/100,fill:S.shapeFill&&!OPEN_SHAPES[d.kind],text:""}); S.sel=S.markups[S.markups.length-1].id; S.selQuiet=true; commit(); return; }
   if(act&&act.mode==="erase"){ const n=act.removed; act=null; if(n){ persist(); snap(); renderPanel(); } return; }
   if(act&&act.mode==="pinch"){ if(ptrs.size===0) act=null; return; }
   stage.classList.remove("panning");
@@ -1246,8 +1253,23 @@ document.addEventListener("keydown", e=>{
 document.addEventListener("keyup", e=>{ if(e.key===" "){ spaceDown=false; stage.classList.toggle("pan", S.tool==="pan"); } });
 
 /* ============ edición ============ */
+function posSelBar(){
+  const bar=$("#selbar"); if(!bar) return;
+  const m=S.sel&&curSheet()&&S.view==="plan"&&!S.drawing&&S.markups.find(x=>x.id===S.sel&&x.sheet===S.cur);
+  if(!m||!m.pts||!m.pts.length){ bar.hidden=true; return; }
+  let pts=m.pts; if(m.type==="rect") pts=rectPts(m);
+  const xs=pts.map(q=>q[0]*S.z+S.tx), ys=pts.map(q=>q[1]*S.z+S.ty);
+  let top=Math.min(...ys)-(m.type==="pin"?60:18)-52, x=(Math.min(...xs)+Math.max(...xs))/2;
+  const r=$("#stage").getBoundingClientRect();
+  if(top<58) top=Math.max(...ys)+18;
+  bar.hidden=false;
+  x=Math.max(90,Math.min(r.width-90,x)); top=Math.max(58,Math.min(r.height-120,top));
+  bar.style.left=x+"px"; bar.style.top=top+"px";
+}
+$("#sbCopy").onclick=()=>{ if(S.sel){ dupMarkup(S.sel); toast("Copiada · arrástrala a donde quieras"); } };
+$("#sbDel").onclick=()=>{ if(S.sel) delMarkup(S.sel); };
 function delMarkup(id){
-  S.markups=S.markups.filter(m=>m.id!==id); if(S.sel===id) S.sel=null; commit(); toast("Marca eliminada · Ctrl+Z para deshacer");
+  S.markups=S.markups.filter(m=>m.id!==id); if(S.sel===id) S.sel=null; commit(); toast("Borrada · toca ↶ para deshacer"); posSelBar();
 }
 function dupMarkup(id){
   const m=S.markups.find(x=>x.id===id); if(!m) return; const off=20/S.z;
@@ -1275,7 +1297,7 @@ function renderProps(onlyReadout){
     return;
   }
   const m=S.markups.find(x=>x.id===S.sel);
-  if(!m){ box.hidden=true; box.innerHTML=""; return; }
+  if(!m||S.selQuiet){ box.hidden=true; box.innerHTML=""; return; }
   if(onlyReadout){ const r=$("#pReadout"); if(r) r.innerHTML=readoutHTML(m); return; }
   box.hidden=false;
   const isPin=m.type==="pin", groups=[...new Set(S.markups.map(x=>x.group).filter(Boolean))];
