@@ -723,7 +723,7 @@ function updHint(){
     case "text": t="Clic donde quieras el texto"; break;
     case "arrow": t="Clic en la punta y luego en la cola"; break;
     case "cloud": t="Clic en una esquina y en la opuesta para encerrar la zona"; break;
-    case "shape": t="Arrastra para dibujar la forma (o toca para ponerla)"; break;
+    case "shape": t="Arrastra para dibujar la forma · arrastra una forma para moverla · los cuadritos cambian su tamaño"; break;
     case "eraser": t="Pasa el borrador sobre los trazos a mano o las formas para quitarlos"; break;
     case "pin-nota": case "pin-observacion": case "pin-levantamiento": t=`Clic en el plano para colocar ${PIN[S.pinKind].label.toLowerCase()}`; break;
   }
@@ -1099,7 +1099,7 @@ stage.addEventListener("pointerdown", e=>{
   if(e.target.closest("button,input,select,textarea,label,a,.hud,.inkbar,.banner,.cmplegend")) return; // controles sobre el plano
   if(e.pointerType==="pen"&&!S.penSeen){ S.penSeen=true; S.penOnly=true; inkBar(); }
   // con Apple Pencil en modo selección: escribe, no selecciona ni mueve (seleccionar es con el dedo)
-  if(e.pointerType==="pen"&&(S.tool==="select"||S.tool==="pan")) setTool("pen");
+  if(e.pointerType==="pen"&&(S.tool==="select"||S.tool==="pan")&&!(S.tool==="select"&&(e.target.closest("[data-h]")||e.target.closest("[data-id]")))) setTool("pen");
   // con un trazo en curso, la palma u otros dedos no interrumpen
   if(act&&(act.mode==="ink"||act.mode==="erase")&&e.pointerType==="touch") return;
   try{ stage.setPointerCapture(e.pointerId); }catch(_){}
@@ -1115,6 +1115,11 @@ stage.addEventListener("pointerdown", e=>{
   }
   if(S.tool==="shape" && e.button===0 && !spaceDown && curSheet()){
     if(S.penOnly&&e.pointerType==="touch"){ act={mode:"pan",sx:e.clientX,sy:e.clientY,tx:S.tx,ty:S.ty,moved:true}; return; }
+    const hh=e.target.closest("[data-h]"), gg=e.target.closest("[data-id]");
+    const sm=S.markups.find(x=>x.id===S.sel);
+    if(hh&&sm&&sm.type==="shape"){ act={mode:"vertex",m:sm,i:+hh.dataset.h,moved:false}; return; }
+    const tm=gg&&S.markups.find(x=>x.id===gg.dataset.id);
+    if(tm&&tm.type==="shape"){ S.sel=tm.id; act={mode:"move",m:tm,start:p,orig:JSON.parse(JSON.stringify(tm.pts)),moved:false}; renderSVG(); return; }
     S.drawing={type:"shape",kind:S.shapeKind,pts:[p,p],w:S.ink.w*1.3/S.z}; act={mode:"shape",sx:e.clientX,sy:e.clientY,pid:e.pointerId}; renderSVG(); return;
   }
   if(drawingTool && S.penOnly && e.pointerType==="touch"){ act={mode:"pan",sx:e.clientX,sy:e.clientY,tx:S.tx,ty:S.ty,moved:true}; return; }
@@ -1168,7 +1173,7 @@ function endPtr(e){
   if(act&&act.mode==="shape"){ if(e.pointerId!==act.pid) return; const d=S.drawing; act=null; S.drawing=null; if(!d||e.type==="pointercancel"){ renderSVG(); return; }
     let [a,b]=d.pts; if(Math.hypot(b[0]-a[0],b[1]-a[1])*S.z<8){ const r=28/S.z; a=[a[0]-r,a[1]-r]; b=[a[0]+2*r,a[1]+2*r]; }
     const rd=q=>[Math.round(q[0]*10)/10,Math.round(q[1]*10)/10];
-    S.markups.push({id:uid(),sheet:S.cur,type:"shape",kind:d.kind,pts:[rd(a),rd(b)],color:S.ink.color,w:Math.round(d.w*100)/100,fill:S.shapeFill&&!OPEN_SHAPES[d.kind],text:""}); commit(); return; }
+    S.markups.push({id:uid(),sheet:S.cur,type:"shape",kind:d.kind,pts:[rd(a),rd(b)],color:S.ink.color,w:Math.round(d.w*100)/100,fill:S.shapeFill&&!OPEN_SHAPES[d.kind],text:""}); S.sel=S.markups[S.markups.length-1].id; commit(); return; }
   if(act&&act.mode==="erase"){ const n=act.removed; act=null; if(n){ persist(); snap(); renderPanel(); } return; }
   if(act&&act.mode==="pinch"){ if(ptrs.size===0) act=null; return; }
   stage.classList.remove("panning");
