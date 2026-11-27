@@ -23,7 +23,7 @@ html.pwa #fDrive{display:none!important}
 <body>
 <title>Trazo · Visor de planos</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito:wght@500;600;700;800&family=Fredoka:wght@500;600;700&family=JetBrains+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito:wght@500;600;700;800&family=Fredoka:wght@500;600;700&family=JetBrains+Mono:wght@400;500&family=Caveat:wght@500;700&family=Patrick+Hand&family=Dancing+Script:wght@600&display=swap">
 <style>
 /* Layout: app de una pantalla. Encabezado arriba, herramientas a la izquierda, plano al centro, panel de cuantificación a la derecha. */
 :root{
@@ -409,6 +409,20 @@ body{font-weight:600}
 .selbar button{display:flex;align-items:center;gap:5px;border:0;background:none;border-radius:999px;padding:7px 12px;font:700 14px var(--display,inherit);color:var(--ink);min-height:40px;cursor:pointer}
 .selbar button:active{background:var(--pink-2)}
 .selbar button.del{color:#b42318}
+.pdfbtn{position:absolute;right:12px;bottom:12px;z-index:6;display:flex;align-items:center;gap:6px;padding:8px 14px;min-height:42px;border:2px solid var(--ink);border-radius:999px;box-shadow:2px 3px 0 var(--ink);background:var(--pink-2,#f9d3df);font:700 14px var(--display,inherit);color:var(--ink);cursor:pointer}
+.pdfbtn:active{transform:translateY(1px)}
+@media (max-width:860px){ .pdfbtn{bottom:12px;right:8px} }
+.tebox{max-width:560px!important;width:calc(100vw - 24px)}
+.tebox textarea{width:100%;box-sizing:border-box;min-height:130px;font-size:34px;line-height:1.2;padding:10px 12px;border:2px solid var(--ink);border-radius:14px;background:#fffdf8;color:var(--ink);resize:vertical}
+.tefonts,.tecols,.tesizes{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+.tefonts button,.tesizes button{border:2px solid var(--line);background:var(--surface);border-radius:12px;padding:6px 12px;font-size:22px;color:var(--ink);cursor:pointer;min-height:44px}
+.tefonts button[aria-pressed="true"],.tesizes button[aria-pressed="true"]{border-color:var(--ink);background:var(--pink-2,#f9d3df)}
+.tefonts button small{display:block;font:600 11px var(--body,inherit);color:var(--muted)}
+.tecols .sw{width:30px;height:30px;border-radius:50%;border:2px solid var(--ink)}
+.tecols .sw[aria-pressed="true"]{box-shadow:0 0 0 3px var(--surface),0 0 0 5px var(--accent)}
+.pdfwait{display:flex;gap:10px;align-items:center}
+.pdfwait i{width:20px;height:20px;border-radius:50%;border:3px solid var(--line);border-top-color:var(--accent);animation:spin 0.9s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
 .inkbar .shb{width:38px;height:38px}
 .inkbar.shp{flex-wrap:wrap;border-radius:24px;row-gap:6px;max-width:min(600px,calc(100% - 200px))}
 @media (max-width:860px){ .inkbar.shp{max-width:calc(100% - 16px)} }
@@ -466,9 +480,10 @@ body{font-weight:600}
       <button class="iconbtn" id="redoBtn" title="Rehacer (Ctrl+Y)" aria-label="Rehacer"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m15 14 5-5-5-5"/><path d="M20 9H10a6 6 0 0 0 0 12h3"/></svg></button>
       <button class="iconbtn" id="labelsBtn" title="Mostrar u ocultar medidas" aria-label="Mostrar medidas" aria-pressed="true"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 7V5h16v2M12 5v14M9 19h6"/></svg></button>
     </div>
+    <button class="pdfbtn" id="pdfBtn" title="Descargar este plano con tus marcas en PDF" aria-label="Descargar PDF con marcas"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 3h8l4 4v14H6z" fill="#fff59a"/><path d="M14 3v4h4"/><path d="M12 10v7M9 14l3 3 3-3"/></svg>PDF</button>
     <div class="hint" id="hint" hidden></div>
     <div class="inkbar" id="inkbar" hidden></div>
-    <div class="selbar" id="selbar" hidden><button id="sbCopy" aria-label="Copiar"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="8" y="8" width="12" height="12" rx="2.5" fill="#fff59a"/><path d="M16 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2"/></svg>Copiar</button><button id="sbDel" class="del" aria-label="Borrar"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h16M9 7V4.5h6V7M6 7l1 13h10l1-13" fill="#fbd3e0"/><path d="M10 11v6M14 11v6"/></svg>Borrar</button></div>
+    <div class="selbar" id="selbar" hidden><button id="sbEdit" aria-label="Editar texto" hidden><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20l1.5-5L16 4.5a2.1 2.1 0 0 1 3 3L8.5 18z" fill="#cfe8ff"/></svg>Editar</button><button id="sbCopy" aria-label="Copiar"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="8" y="8" width="12" height="12" rx="2.5" fill="#fff59a"/><path d="M16 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2"/></svg>Copiar</button><button id="sbDel" class="del" aria-label="Borrar"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h16M9 7V4.5h6V7M6 7l1 13h10l1-13" fill="#fbd3e0"/><path d="M10 11v6M14 11v6"/></svg>Borrar</button></div>
     <button class="paneltg" id="panelTg" aria-pressed="false" title="Mostrar u ocultar cuantificación, notas y material"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M15 4v16"/></svg><span>Cuantificación</span></button>
     <div class="sharp" id="sharpPill" hidden><i></i>Afinando plano…</div>
     <div class="tip" id="tip" hidden></div>
@@ -709,7 +724,7 @@ function setTool(id, keepPreset){
   finishDrawing(true);
   if(!keepPreset) S.preset=null;
   S.calib=null;
-  S.tool=id; S.selQuiet=false;
+  S.tool=id; if(S.selQuiet) S.sel=null; S.selQuiet=false;
   if(id.startsWith("pin-")) S.pinKind=id.slice(4);
   document.querySelectorAll(".tool").forEach(b=>b.setAttribute("aria-pressed", b.id==="tool-"+id));
   const st=$("#stage"); st.classList.toggle("pan", id==="pan"); st.classList.toggle("draw", id!=="pan"&&id!=="select");
@@ -979,7 +994,11 @@ function shapeSVG(m, z, sel){
       g=P.map((q,i)=>`<g><circle cx="${q[0]}" cy="${q[1]}" r="${9/z}" fill="${ms?(i<got?"#2d7a46":"#98a2b3"):c}" fill-opacity=".85" stroke="#fff" stroke-width="${1.5/z}"/><text x="${q[0]}" y="${q[1]+3.6/z}" font-size="${10/z}" text-anchor="middle" fill="#fff" font-family="JetBrains Mono,monospace" pointer-events="none">${i+1}</text></g>`).join("");
       if(showLab && P.length){ lab=label(P[0][0]+12/z,P[0][1]-18/z,(m.name||"Conteo")+": "+qtyStr(r)+(ms?` · llegaron ${got}`:""),c,z,"start"); }
       break; }
-    case "text": {
+    case "text": if(m.font){
+      const fs=(m.size||16), F=tfont(m.font), lines=String(m.text||"Texto").split("\n"), lh=fs*1.2;
+      const w=Math.max(...lines.map(l=>l.length))*fs*F[3]+fs*0.4, h=lines.length*lh+fs*0.3;
+      g=`<rect x="${P[0][0]}" y="${P[0][1]}" width="${w}" height="${h}" fill="transparent"/>`+lines.map((l,i)=>`<text x="${P[0][0]+fs*0.1}" y="${P[0][1]+fs*0.95+i*lh}" font-size="${fs}" fill="${c}" font-family="${F[2]}" font-weight="${F[4]}">${esc(l)}</text>`).join("");
+      break; } else {
       const fs=(m.size||16); const lines=String(m.text||"Texto").split("\n");
       const w=Math.max(...lines.map(l=>l.length))*fs*0.58+12, h=lines.length*fs*1.25+8;
       g=`<rect x="${P[0][0]}" y="${P[0][1]}" width="${w}" height="${h}" fill="#ffffff" fill-opacity=".85" stroke="${c}" stroke-width="${sw}"/>`+
@@ -1103,7 +1122,7 @@ function snapPoint(p, e){
 const stage=$("#stage");
 stage.addEventListener("pointerdown", e=>{
   if(!curSheet()) return;
-  if(e.target.closest("button,input,select,textarea,label,a,.hud,.inkbar,.selbar,.banner,.cmplegend")) return; // controles sobre el plano
+  if(e.target.closest("button,input,select,textarea,label,a,.hud,.inkbar,.selbar,.pdfbtn,.banner,.cmplegend")) return; // controles sobre el plano
   if(e.pointerType==="pen"&&!S.penSeen){ S.penSeen=true; S.penOnly=true; inkBar(); }
   // con Apple Pencil en modo selección: escribe, no selecciona ni mueve (seleccionar es con el dedo)
   if(e.pointerType==="pen"&&(S.tool==="select"||S.tool==="pan")&&!(S.tool==="select"&&(e.target.closest("[data-h]")||e.target.closest("[data-id]")))) setTool("pen");
@@ -1208,8 +1227,7 @@ function clickAt(p, e){
     S.markups.push(m); S.sel=m.id; commit(); setTool("select"); focusField("#pName"); return;
   }
   if(T==="text"){
-    const m={id:uid(),sheet:S.cur,type:"text",pts:[p],color:S.color,text:"Texto",size:Math.round(18/S.z)||16};
-    S.markups.push(m); S.sel=m.id; commit(); setTool("select"); focusField("#pText"); return;
+    textEditor(null,p); return;
   }
   if(!S.drawing) S.drawing={type:T,pts:[]};
   const d=S.drawing;
@@ -1253,6 +1271,142 @@ document.addEventListener("keydown", e=>{
 document.addEventListener("keyup", e=>{ if(e.key===" "){ spaceDown=false; stage.classList.toggle("pan", S.tool==="pan"); } });
 
 /* ============ edición ============ */
+const TFONTS=[["hand","Manuscrita","Caveat,cursive",0.42,600],["note","Cuaderno","'Patrick Hand',cursive",0.45,400],["fancy","Elegante","'Dancing Script',cursive",0.47,600],["round","Redondita","Fredoka,sans-serif",0.52,500],["plain","Normal","Nunito,sans-serif",0.52,600]];
+const tfont=k=>TFONTS.find(f=>f[0]===k)||TFONTS[0];
+const TSIZES=[["Chica",16],["Mediana",26],["Grande",40]];
+function textEditor(m,p){
+  const host=$("#modalHost"); const isNew=!m;
+  const st={font:m?(m.font||"plain"):(S.ink.tfont||"hand"), color:m?m.color:(S.ink.tcolor||S.ink.color), sz:S.ink.tsz||1};
+  const cols=["#1b2430","#e0457b","#d92d20","#ef6820","#eab308","#2d7a46","#1570ef","#6941c6","#8b5a3c"];
+  const draw=()=>{
+    host.innerHTML=`<div class="modal" role="dialog" aria-modal="true" aria-labelledby="teT"><div class="box tebox"><h3 id="teT" style="margin:0">${isNew?"Escribe tu texto":"Editar texto"}</h3>
+    <p class="small muted" style="margin:0">Escribe dentro del recuadro con el Apple Pencil: el iPad lo vuelve letra. También puedes usar el teclado.</p>
+    <textarea id="teText" placeholder="Escribe aquí…" style="font-family:${tfont(st.font)[2]};font-weight:${tfont(st.font)[4]};color:${st.color}"></textarea>
+    <div class="tefonts" role="group" aria-label="Letra">${TFONTS.map(f=>`<button data-tf="${f[0]}" aria-pressed="${f[0]===st.font}" style="font-family:${f[2]};font-weight:${f[4]}">Hola<small>${f[1]}</small></button>`).join("")}</div>
+    <div class="tecols" role="group" aria-label="Color">${cols.map(c=>`<button class="sw" data-tc="${c}" style="background:${c}" aria-label="Color ${c}" aria-pressed="${c===st.color}"></button>`).join("")}</div>
+    ${isNew?`<div class="tesizes" role="group" aria-label="Tamaño">${TSIZES.map((t,i)=>`<button data-ts="${i}" aria-pressed="${i===st.sz}" style="font-size:${12+i*5}px">${t[0]}</button>`).join("")}</div>`:""}
+    <div class="actions"><button class="btn primary" id="teOk">Listo</button><button class="btn" id="teCancel">Cancelar</button></div></div></div>`;
+    const ta=$("#teText"); ta.value=st.text!=null?st.text:(m?(m.text||""):"");
+    ta.oninput=()=>{ st.text=ta.value; };
+    host.querySelectorAll("[data-tf]").forEach(b=>b.onclick=()=>{ st.text=ta.value; st.font=b.dataset.tf; draw(); });
+    host.querySelectorAll("[data-tc]").forEach(b=>b.onclick=()=>{ st.text=ta.value; st.color=b.dataset.tc; draw(); });
+    host.querySelectorAll("[data-ts]").forEach(b=>b.onclick=()=>{ st.text=ta.value; st.sz=+b.dataset.ts; draw(); });
+    $("#teCancel").onclick=()=>{ host.innerHTML=""; };
+    $("#teOk").onclick=()=>{
+      const txt=ta.value.replace(/\s+$/,""); host.innerHTML="";
+      S.ink.tfont=st.font; S.ink.tcolor=st.color; S.ink.tsz=st.sz; inkSave();
+      if(m){ if(!txt){ delMarkup(m.id); return; } m.text=txt; m.font=st.font; m.color=st.color; S.sel=m.id; commit(); return; }
+      if(!txt) return;
+      const n={id:uid(),sheet:S.cur,type:"text",pts:[p],color:st.color,font:st.font,text:txt,size:Math.max(4,Math.round(TSIZES[st.sz][1]/S.z*10)/10)};
+      S.markups.push(n); S.sel=n.id; S.selQuiet=true; commit();
+    };
+  };
+  draw();
+}
+/* ===== PDF con marcas ===== */
+function loadPdfLib(){
+  if(window.PDFLib) return Promise.resolve();
+  return new Promise((res,rej)=>{ const sc=document.createElement("script"); sc.src="https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.1/pdf-lib.min.js"; sc.onload=res; sc.onerror=()=>rej(new Error("No se pudo cargar el generador de PDF (¿sin internet?)")); document.head.appendChild(sc); });
+}
+function drawTextCanvas(ctx,m,k,z){
+  const fs=(m.size||16), lines=String(m.text||"Texto").split("\n"), x=m.pts[0][0], y=m.pts[0][1];
+  ctx.save(); ctx.scale(k,k); ctx.textBaseline="alphabetic";
+  if(m.font){ const F=tfont(m.font); ctx.font=`${F[4]} ${fs}px ${F[2]}`; ctx.fillStyle=m.color; lines.forEach((l,i)=>ctx.fillText(l,x+fs*0.1,y+fs*0.95+i*fs*1.2)); }
+  else { const w=Math.max(...lines.map(l=>l.length))*fs*0.58+12, h=lines.length*fs*1.25+8;
+    ctx.fillStyle="rgba(255,255,255,.85)"; ctx.fillRect(x,y,w,h); ctx.strokeStyle=m.color; ctx.lineWidth=2/z; ctx.strokeRect(x,y,w,h);
+    ctx.font=`500 ${fs}px Nunito,sans-serif`; ctx.fillStyle=m.color; lines.forEach((l,i)=>ctx.fillText(l,x+6,y+4+fs*(i+1)*1.1)); }
+  ctx.restore();
+}
+async function overlayCanvas(sh,W,base){
+  const k=W/sh.w, H=Math.round(sh.h*k), z=1800/Math.max(sh.w,sh.h);
+  const list=S.markups.filter(m=>m.sheet===sh.id);
+  const keepSel=S.sel; S.sel=null; let body="";
+  try{ list.filter(m=>m.type!=="pin"&&m.type!=="text").concat(list.filter(m=>m.type==="pin")).forEach(m=>{ body+=shapeSVG(m,z,false); }); } finally { S.sel=keepSel; }
+  const cv=document.createElement("canvas"); cv.width=W; cv.height=H; const ctx=cv.getContext("2d"); if(!ctx) throw new Error("El iPad no dio memoria para el PDF");
+  if(base){ ctx.fillStyle="#fff"; ctx.fillRect(0,0,W,H); ctx.drawImage(base,0,0,W,H); }
+  if(body){ const svg=`<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}" viewBox="0 0 ${sh.w} ${sh.h}">${body}</svg>`;
+    const img=await loadImg("data:image/svg+xml;charset=utf-8,"+encodeURIComponent(svg)); ctx.drawImage(img,0,0,W,H); }
+  const texts=list.filter(m=>m.type==="text");
+  if(texts.length){ try{ await Promise.all([...new Set(texts.map(m=>m.font?tfont(m.font):null).filter(Boolean))].map(F=>document.fonts.load(`${F[4]} 20px ${F[2]}`))); }catch(e){} texts.forEach(m=>drawTextCanvas(ctx,m,k,z)); }
+  return cv;
+}
+const cvBytes=(cv,type,q)=>new Promise((res,rej)=>cv.toBlob(b=>b?b.arrayBuffer().then(res,rej):rej(new Error("toBlob")),type,q));
+function pdfSafe(t){ return String(t||"").replace(/[‘’]/g,"'").replace(/[“”]/g,'"').replace(/[–—]/g,"-").replace(/…/g,"...").replace(/[^\x20-\x7e\xa0-\xff\n]/g,""); }
+function notesPage(out,sh,font,bold){
+  const pins=S.markups.filter(m=>m.sheet===sh.id&&m.type==="pin");
+  const marks=S.markups.filter(m=>m.sheet===sh.id&&(m.type==="arrow"||m.type==="cloud"||m.type==="shape")&&m.text);
+  if(!pins.length&&!marks.length) return;
+  let pg=out.addPage([612,792]), y=750; const L=48, Wd=516;
+  const line=(t,f,sz,col)=>{ const words=pdfSafe(t).split(/\s+/); let cur="";
+    const flush=()=>{ if(y<60){ pg=out.addPage([612,792]); y=750; } pg.drawText(cur,{x:L,y,size:sz,font:f,color:col}); y-=sz*1.35; cur=""; };
+    words.forEach(w=>{ const t2=cur?cur+" "+w:w; if(f.widthOfTextAtSize(t2,sz)>Wd&&cur){ flush(); cur=w; } else cur=t2; }); if(cur) flush(); };
+  const {rgb}=PDFLib, ink=rgb(.23,.15,.13), mut=rgb(.45,.38,.36);
+  line("Notas y observaciones - "+sh.name,bold,16,ink); y-=6;
+  pins.forEach(m=>{ const k=PIN[m.kind]||PIN.nota; y-=4;
+    line(`${k.letter}${pinNumber(m)}  ${k.label}${m.name?": "+m.name:""}`,bold,12,ink);
+    const meta=[m.estado?"Estado: "+(ESTADOS[m.estado]||m.estado):"",m.resp?"Responsable: "+m.resp:"",m.fecha?"Fecha: "+m.fecha:""].filter(Boolean).join("   ");
+    if(meta) line(meta,font,10,mut); if(m.text) line(m.text,font,11,ink); });
+  if(marks.length){ y-=8; line("Comentarios en el plano",bold,12,ink); marks.forEach(m=>line("- "+(TYPE_LBL[m.type]||"")+": "+m.text,font,11,ink)); }
+}
+async function exportPDF(){
+  const sh=curSheet(); if(!sh) return;
+  const host=$("#modalHost");
+  host.innerHTML=`<div class="modal" role="dialog" aria-modal="true"><div class="box" style="max-width:380px"><div class="pdfwait"><i></i><b>Preparando tu PDF…</b></div><p class="small muted" style="margin:0">El plano sale nítido y con todas tus marcas.</p></div></div>`;
+  try{
+    await loadPdfLib(); const {PDFDocument,degrees,StandardFonts}=PDFLib;
+    const out=await PDFDocument.create(); out.setTitle(sh.name+" (con marcas)"); out.setCreator("Trazo");
+    const maxA=11e6, W=Math.min(7000,Math.round(Math.sqrt(maxA*sh.w/sh.h)));
+    let done=false;
+    if(pdfKeyOf(sh)){
+      try{
+        let blob=sh.pdfKey?await pdfBlobGet(sh.pdfKey).catch(()=>null):null;
+        if(!blob&&sh.pdf){ const r=await fetch("/_blob/"+sh.pdf); if(r.ok) blob=await r.blob(); }
+        if(blob){
+          const src=await PDFDocument.load(await blob.arrayBuffer(),{ignoreEncryption:true});
+          const [pg]=await out.copyPages(src,[(sh.page||1)-1]); out.addPage(pg);
+          const ov=await overlayCanvas(sh,W,null); const png=await out.embedPng(await cvBytes(ov,"image/png")); ov.width=ov.height=1;
+          const cb=pg.getCropBox(), rot=(((pg.getRotation().angle||0)%360)+360)%360;
+          if(rot===90) pg.drawImage(png,{x:cb.x+cb.width,y:cb.y,width:cb.height,height:cb.width,rotate:degrees(90)});
+          else if(rot===180) pg.drawImage(png,{x:cb.x+cb.width,y:cb.y+cb.height,width:cb.width,height:cb.height,rotate:degrees(180)});
+          else if(rot===270) pg.drawImage(png,{x:cb.x,y:cb.y+cb.height,width:cb.height,height:cb.width,rotate:degrees(270)});
+          else pg.drawImage(png,{x:cb.x,y:cb.y,width:cb.width,height:cb.height});
+          done=true;
+        }
+      }catch(e){ console.warn("PDF original no usable, se arma como imagen",e); }
+    }
+    if(!done){
+      const base=await sheetImage(sh); if(!base) throw new Error("No encontré la imagen del plano");
+      const ov=await overlayCanvas(sh,W,base); const jpg=await out.embedJpg(await cvBytes(ov,"image/jpeg",0.92)); ov.width=ov.height=1;
+      const pw=sh.pw||sh.w*0.75, ph=pw*sh.h/sh.w; const pg=out.addPage([pw,ph]); pg.drawImage(jpg,{x:0,y:0,width:pw,height:ph});
+    }
+    notesPage(out,sh,await out.embedFont(StandardFonts.Helvetica),await out.embedFont(StandardFonts.HelveticaBold));
+    const bytes=await out.save();
+    const name=(String(sh.name||"plano").replace(/[\\/:*?"<>|]+/g,"-").trim()||"plano")+" - marcado.pdf";
+    pdfOutReady(bytes,name);
+  }catch(err){
+    host.innerHTML=""; toast("No pude armar el PDF: "+(err&&err.message||err));
+  }
+}
+async function pdfOutReady(bytes,name){
+  const host=$("#modalHost"); const blob=new Blob([bytes],{type:"application/pdf"});
+  const dl=window.claude&&window.claude.use?await window.claude.use("downloads").catch(()=>null):null;
+  const file=(typeof File!=="undefined")?new File([blob],name,{type:"application/pdf"}):null;
+  const canShare=!dl&&file&&navigator.canShare&&navigator.canShare({files:[file]});
+  const mb=(blob.size/1048576).toFixed(1);
+  host.innerHTML=`<div class="modal" role="dialog" aria-modal="true" aria-labelledby="prT"><div class="box" style="max-width:420px"><h3 id="prT" style="margin:0">Tu PDF está listo 🎉</h3>
+  <p class="small" style="margin:0"><b></b> · ${mb} MB</p>
+  ${dl?`<button class="btn primary" id="prSave">Descargar PDF</button>`:""}
+  ${canShare?`<button class="btn primary" id="prShare">Compartir o guardar (WhatsApp, correo, Archivos)</button>`:""}
+  ${!dl?`<a class="btn${canShare?"":" primary"}" id="prDl" download>Descargar PDF</a>`:""}
+  <div class="actions"><button class="btn sm" id="prClose">Cerrar</button></div></div></div>`;
+  host.querySelector("p b").textContent=name;
+  let url=null; const close=()=>{ host.innerHTML=""; if(url) setTimeout(()=>URL.revokeObjectURL(url),60000); };
+  $("#prClose").onclick=close;
+  if(dl) $("#prSave").onclick=async()=>{ try{ await dl.save({filename:name,data:bytes}); close(); toast("PDF descargado"); }catch(e){ if(e&&e.code==="declined") return; toast("No se pudo descargar: "+(e&&e.message||e&&e.code||"")); } };
+  if(canShare) $("#prShare").onclick=async()=>{ try{ await navigator.share({files:[file],title:name}); close(); }catch(e){ if(e&&e.name==="AbortError") return; toast("No se pudo compartir; usa Descargar"); } };
+  const a=$("#prDl"); if(a){ url=URL.createObjectURL(blob); a.href=url; a.download=name; }
+}
+$("#pdfBtn").onclick=()=>exportPDF();
 function posSelBar(){
   const bar=$("#selbar"); if(!bar) return;
   const m=S.sel&&curSheet()&&S.view==="plan"&&!S.drawing&&S.markups.find(x=>x.id===S.sel&&x.sheet===S.cur);
@@ -1262,10 +1416,11 @@ function posSelBar(){
   let top=Math.min(...ys)-(m.type==="pin"?60:18)-52, x=(Math.min(...xs)+Math.max(...xs))/2;
   const r=$("#stage").getBoundingClientRect();
   if(top<58) top=Math.max(...ys)+18;
-  bar.hidden=false;
+  bar.hidden=false; $("#sbEdit").hidden=m.type!=="text";
   x=Math.max(90,Math.min(r.width-90,x)); top=Math.max(58,Math.min(r.height-120,top));
   bar.style.left=x+"px"; bar.style.top=top+"px";
 }
+$("#sbEdit").onclick=()=>{ const m=S.markups.find(x=>x.id===S.sel); if(m&&m.type==="text") textEditor(m); };
 $("#sbCopy").onclick=()=>{ if(S.sel){ dupMarkup(S.sel); toast("Copiada · arrástrala a donde quieras"); } };
 $("#sbDel").onclick=()=>{ if(S.sel) delMarkup(S.sel); };
 function delMarkup(id){
