@@ -478,7 +478,7 @@ body{font-weight:600}
       <span style="width:1px;height:20px;background:var(--line)"></span>
       <button class="iconbtn" id="undoBtn" title="Deshacer (Ctrl+Z)" aria-label="Deshacer"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 14 4 9l5-5"/><path d="M4 9h10a6 6 0 0 1 0 12h-3"/></svg></button>
       <button class="iconbtn" id="redoBtn" title="Rehacer (Ctrl+Y)" aria-label="Rehacer"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m15 14 5-5-5-5"/><path d="M20 9H10a6 6 0 0 0 0 12h3"/></svg></button>
-      <button class="iconbtn" id="labelsBtn" title="Mostrar u ocultar medidas" aria-label="Mostrar medidas" aria-pressed="true"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 7V5h16v2M12 5v14M9 19h6"/></svg></button>
+      <button class="iconbtn" id="labelsBtn" title="Mostrar u ocultar medidas" aria-label="Mostrar medidas" aria-pressed="true"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="2.5" y="8" width="19" height="8" rx="1.5"/><path d="M6 8v3M9.5 8v4M13 8v3M16.5 8v4"/></svg></button>
     </div>
     <button class="pdfbtn" id="pdfBtn" title="Descargar este plano con tus marcas en PDF" aria-label="Descargar PDF con marcas"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 3h8l4 4v14H6z" fill="#fff59a"/><path d="M14 3v4h4"/><path d="M12 10v7M9 14l3 3 3-3"/></svg>PDF</button>
     <div class="hint" id="hint" hidden></div>
@@ -498,7 +498,7 @@ body{font-weight:600}
 
   <section class="files" id="files" hidden>
     <aside class="ftree" aria-label="Carpetas">
-      <div class="fhead">Carpetas<button class="iconbtn" id="fNewTop" title="Nueva carpeta en la raíz" aria-label="Nueva carpeta en la raíz" style="margin-left:auto"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg></button></div>
+      <div class="fhead">Carpetas<small style="margin-left:8px;font-weight:600;color:var(--muted);font-size:11px">versión 27</small><button class="iconbtn" id="fNewTop" title="Nueva carpeta en la raíz" aria-label="Nueva carpeta en la raíz" style="margin-left:auto"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg></button></div>
       <div id="tree"></div>
     </aside>
     <div class="fmain" id="fmain" style="position:relative">
@@ -740,7 +740,7 @@ function updHint(){
     case "area": t = d?"Clic en cada vértice · doble clic o Enter para cerrar el área":"Clic en el primer vértice del área"; break;
     case "rect": t="Clic en una esquina y en la esquina opuesta"; break;
     case "count": t = d?`Clic en cada pieza (${d.pts.length}) · Enter o Esc para terminar`:"Clic en cada pieza a contar"; break;
-    case "text": t="Clic donde quieras el texto"; break;
+    case "text": t="Toca el plano donde quieras escribir · arrastra un texto para moverlo"; break;
     case "arrow": t="Clic en la punta y luego en la cola"; break;
     case "cloud": t="Clic en una esquina y en la opuesta para encerrar la zona"; break;
     case "shape": t="Arrastra para dibujar la forma · arrastra una forma para moverla · los cuadritos cambian su tamaño"; break;
@@ -1157,6 +1157,8 @@ stage.addEventListener("pointerdown", e=>{
     if(g){ const m=S.markups.find(x=>x.id===g.dataset.id); if(m){ S.sel=m.id; S.selQuiet=false; act={mode:"move",m,start:p,orig:JSON.parse(JSON.stringify(m.pts)),moved:false}; renderSVG(); renderProps(); renderPanel(); return; } }
     act={mode:"pan",sx:e.clientX,sy:e.clientY,tx:S.tx,ty:S.ty,moved:false,deselect:true}; return;
   }
+  if(S.tool==="text"){ const gt=e.target.closest("[data-id]"), tm=gt&&S.markups.find(x=>x.id===gt.dataset.id);
+    if(tm&&tm.type==="text"){ S.sel=tm.id; S.selQuiet=true; act={mode:"move",m:tm,start:p,orig:JSON.parse(JSON.stringify(tm.pts)),moved:false}; renderSVG(); return; } }
   // herramientas de dibujo: clic = punto, arrastre = mover plano
   act={mode:"pending",sx:e.clientX,sy:e.clientY,tx:S.tx,ty:S.ty,moved:false,p};
 });
@@ -2603,6 +2605,6 @@ let lastSize=null; new ResizeObserver(()=>{ const r=stage.getBoundingClientRect(
   setInterval(()=>{ if(S.gs.at&&document.visibilityState==="visible") syncSheets(false); }, 5*60*1000);
 })();
 </script>
-<script>if("serviceWorker" in navigator) window.addEventListener("load",()=>navigator.serviceWorker.register("sw.js").catch(()=>{}));</script>
+<script>if("serviceWorker" in navigator){ const had=!!navigator.serviceWorker.controller; let done=false; navigator.serviceWorker.addEventListener("controllerchange",()=>{ if(had&&!done){ done=true; location.reload(); } }); window.addEventListener("load",()=>navigator.serviceWorker.register("sw.js",{updateViaCache:"none"}).then(r=>r.update()).catch(()=>{})); document.addEventListener("visibilitychange",()=>{ if(document.visibilityState==="visible") navigator.serviceWorker.getRegistration().then(r=>r&&r.update()).catch(()=>{}); }); }</script>
 </body>
 </html>
